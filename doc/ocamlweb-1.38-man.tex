@@ -1,0 +1,557 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{fullpage}
+\usepackage{url}
+
+\newcommand{\WEB}{\textsf{WEB}}
+\newcommand{\Caml}{\textsf{Caml}}
+\newcommand{\OCaml}{\textsf{Objective Caml}}
+\newcommand{\ocamlweb}{\textsf{ocamlweb}}
+\newcommand{\monurl}[1]{#1}
+%HEVEA\renewcommand{\monurl}[1]{\ahref{#1}{#1}}
+%HEVEA\newcommand{\lnot}{not}
+%HEVEA\newcommand{\lor}{or}
+%HEVEA\newcommand{\land}{\&}
+
+\begin{document}
+
+%%% titre %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{ocamlweb: a literate programming tool \\ 
+               for Objective Caml}
+\author{Jean-Christophe Filli\^{a}tre and Claude March\'e \\
+        \normalsize\monurl{\url{http://www.lri.fr/~filliatr/ocamlweb}}}
+\date{}
+\maketitle
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+Literate programming has been introduced by D.~E.~Knuth in 1984.  The
+main idea is to put the code and its documentation in the same file and
+to produce from it a document which is readable by a human, and not
+only by a machine.
+Although \ocamlweb\ borrows a lot of ideas from Knuth's original tool
+(called \WEB), there are big differences between them. First, \WEB\ 
+allows you to present the pieces of your code in any order, and this
+is quite useful when using poorly structured languages, like
+\textsf{Pascal} or \textsf{C}. But \OCaml\ is already highly
+structured, and this is no more useful. Moreover, \WEB\ requires the
+use of a tool to produce the code from the \WEB\ file, which greatly
+complicates the use of your favorite source-based tools (dependencies
+generator, debugger, emacs mode, etc.). When using \ocamlweb, the
+documentation is inserted in the code as comments (in the \Caml\ 
+sense), and your code is not linked to the existence of \ocamlweb\ in
+any way.
+
+Currently, the task of \ocamlweb\ may be seen as:
+\begin{enumerate}
+\item making a nice document with the code and its documentation;
+\item generating a global index of cross-references, where each
+  identifier is associated to the lists of sections where it is
+  defined or used.
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Principles}
+
+Documentation is inserted into \Caml\ files as \emph{comments}.  Thus
+your files may compile as usual, whether you use \ocamlweb\ or not.
+\ocamlweb\ presupposes that the given \Caml\ files are well-formed (at
+least lexically, but also syntactically if you want the cross
+references to be correct).  \ocamlweb\ understands each \Caml\ file as
+a sequence of paragraphs, each paragraph being either a piece of code or a
+piece of documentation.  Documentation starts and ends with \Caml\ 
+comment's delimiters \texttt{(*} and \texttt{*)}, and is a regular
+\LaTeX\ text. Code starts with any characters sequence other than
+\texttt{(*} and ends with an empty line.
+
+Two styles are available for the final document:
+\begin{itemize}
+  
+\item a \WEB\ style, where the code and documentation are displayed in
+  \emph{sections}, numbered consecutively starting from~1.  A new
+  section is started at the beginning of each file. You can also start
+  a new section manually (see the paragraph below about controls);
+
+\item a \LaTeX\ style, where you structure your document as you like,
+  using the usual sectioning commands of \LaTeX. 
+
+\end{itemize}
+
+
+\paragraph{Escapings: code inside documentation and vice versa.}
+The first feature you will require is the ability to quote code inside
+documentation and conversely. The latter, namely documentation inside
+code, is simply obtained by normal \Caml\ comments filled in with a
+\LaTeX\ contents. The former is obtained by quoting code between the
+delimiters \texttt{[} and \texttt{]}. Square brackets may be nested,
+the inner ones being understood as being part of the quoted code (thus
+you can quote a list expression like $[1;2;3]$ by writing
+\texttt{[[1;2;3]]}). Inside quotations, the code is pretty-printed in
+the same way as it is in code parts.
+
+
+\paragraph{Controls.}
+In addition to the default behavior of \ocamlweb, you can control it
+through a small set of commands, which are comments of a particular
+shape. These commands are the following:
+\begin{description}
+
+\item[\texttt{(*s}] ~\par
+  
+  Starts a new section. (Meaningless in \LaTeX\ style.)
+
+\item[\texttt{(*i} \quad\dots\quad \texttt{i*)}] ~\par
+  
+  Ignores all the text between those two delimiters.  Such ``comments''
+  cannot be nested but any \Caml\ code and comments may appear between
+  them, included nested \Caml\ comments.  You can use those delimiters
+  to enclose a comment that shouldn't appear in the document, but also
+  to hide some \Caml\ code, putting it between \texttt{(*i*)} and
+  \texttt{(*i*)} in such a way that your code still compiles but is
+  ignored by \ocamlweb. (Notice that if you use the delimiters
+  \texttt{(*i} and \texttt{i*)} directly, the text enclosed is commented
+  for both \Caml\ and \ocamlweb.)
+
+\item[\texttt{(*c}] ~\par
+  
+  Tells \ocamlweb\ that this is a real \Caml\ comment an not a
+  documentation text. Mainly useful is you want to insert comments
+  after empty lines. However, this is not the spirit of \ocamlweb, and
+  you are encouraged to put the documentation in separate \LaTeX\ 
+  paragraphs and not in traditional \Caml\ comments.
+
+\item[\texttt{(*r}] ~\par
+
+  Justifies an end-of-line comment on the right margin.
+
+\item[\texttt{(*p} \quad\dots\quad \texttt{*)}] ~\par
+
+  Insert some material in the \LaTeX\ preamble. See also command line
+  option \verb!-p!.
+
+\end{description}
+
+\paragraph{Pretty-printing.} 
+\ocamlweb\ uses different faces for identifiers and keywords, and use
+mathematical symbols for some \Caml\ tokens. Here are the
+correspondences.
+\begin{center}
+  \begin{tabular}{ll@{\qquad\qquad}ll@{\qquad\qquad}ll@{\qquad\qquad}}
+    \verb!->!            & $\rightarrow$   &
+    \verb!<-!            & $\leftarrow$    &
+    \verb|*|             & $\times$        \\
+    \verb|<=|            & $\le$           &
+    \verb|>=|            & $\ge$           &
+    \verb|~-|            & $-$             \\
+    \verb|<>|            & $\not=$         &
+    \verb|==|            & $\equiv$        &
+    \verb|!=|            & $\not\equiv$    \\
+    \verb|or|, \verb!||! & $\lor$          &
+    \verb|&|, \verb|&&|  & $\land$         &
+    \verb|not|           & $\lnot$ 
+  \end{tabular}
+\end{center}
+Integers and floating-point literals are pretty-printed like this:
+\begin{center}
+  \begin{tabular}{l@{$\quad\rightarrow\quad$}l}
+    \verb|123|      & $123$      \\
+    \verb|0b010011| & $010011_2$ \\
+    \verb|0o466|    & $466_8$    \\
+    \verb|0x3fff|   & $\mathtt{3fff}_{16}$ \\
+    \verb|1.2e6|    & $1.2\cdot 10^6$      \\
+    \verb|1e-4|     & $10^{-4}$
+  \end{tabular}
+\end{center}
+Characters strings are pretty-printed in fixed-width
+%HEVEAfont.
+%BEGIN LATEX
+font, and spaces are explicitly shown as the symbol {\tt\char`\ },
+as in \texttt{"a\char`\ constant\char`\ string"}.
+%END LATEX
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Hints to get a pretty document}
+
+\ocamlweb\ is rather robust, in the sense that it will always succeed
+in producing a document, as soon as the \Caml\ files are lexically
+correct. However, you may find the result rather ugly if so were your
+source files. Here are some style hints to get a pretty document.
+
+First, \ocamlweb\ is not a real code pretty-printer: it does not
+indent your code, and it
+does not even cut your code lines when they are too long. The code
+will always appear formatted as it is in the source files. The
+indentation at the beggining of each line is output as a proportional
+space (tabulations are correctly translated). In particular, if you
+want your pattern-matchings to be aligned, you have to put a `\verb!|!'
+also in front of the first pattern. Here is the difference:
+\begin{displaymath}
+  \begin{array}{l}
+    \mathsf{let}~\mathit{f}~=~\mathsf{function} \\
+    \hspace*{2em}\mathit{O}~\rightarrow~\dots \\
+    \hspace*{1em}|~(\mathit{S}~p)~\rightarrow~\dots
+  \end{array}
+  \qquad\qquad
+  \begin{array}{l}
+    \mathsf{let}~\mathit{f}~=~\mathsf{function} \\
+    \hspace*{1em}|~\mathit{O}~\rightarrow~\dots \\
+    \hspace*{1em}|~(\mathit{S}~p)~\rightarrow~\dots
+  \end{array}
+\end{displaymath}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Usage}
+
+\ocamlweb\ is invoked on a shell command line as follows:
+\begin{displaymath}
+  \texttt{ocamlweb }<\textit{options and files}>
+\end{displaymath}
+Any command line argument which is not an option is considered to be a
+file (even if it starts with a \verb!-!). \Caml\ files are identified
+by the suffixes \verb!.ml! and \verb!.mli!, and \LaTeX\ files by the
+suffix \verb!.tex!. The latter will be copied `as is' in the final
+document. The order of files on the command line is kept in the final
+document.
+
+\subsection*{Command line options}
+
+%%% attention : -- dans un argument de \texttt est affiché comme un
+%%% seul - d'où l'utilisation de la macro suivante
+\newcommand{\mm}{\symbol{45}\symbol{45}}
+
+\begin{description}
+
+\item[\texttt{-o }\textit{file}, \texttt{\mm{}output }\textit{file}] ~\par
+  
+  Redirects the output into the file `\textit{file}'.
+
+\item[\texttt{\mm{}noweb}] ~\par
+  
+  In that case, there are no sections à la WEB, and the user
+  structurates his document directly through \LaTeX\ commands, like
+  for instance \verb|\section|, \verb|\subsection|, etc.  There is
+  still an index, in the usual \LaTeX\ sense. (Therefore, if you have
+  introduced \LaTeX\ sections and subsections, their numbers will
+  appear in the index.)
+
+\item[\texttt{-s }, \texttt{\mm{}short}] ~\par
+  
+  Do not insert titles for the files. The default behavior is to
+  insert a title like ``Module Foo'' or ``Interface for module Foo''
+  for each file.
+
+\item[\texttt{\mm{}no-index}] ~\par
+  
+  Do not output the index.
+
+\item[\texttt{\mm{}dvi}] ~\par
+  
+  Output in DVI format, instead of \LaTeX\ format. (You need \texttt{latex}
+  to be installed and present in your path.)
+
+\item[\texttt{\mm{}ps}] ~\par
+  
+  Output in PostScript format, instead of \LaTeX\ format. (You need
+  both \texttt{latex} and \texttt{dvips} to be installed and present
+  in your path.)
+
+\item[\texttt{\mm{}html}] ~\par
+  
+  Output in HTML format, instead of \LaTeX\ format. (You need
+  both \texttt{latex} and \texttt{hevea} to be installed and present
+  in your path.)
+
+\item[\texttt{\mm{}hevea-option }\textit{option}] ~\par
+  
+  Passes the given option to \texttt{hevea} (to be used with the
+  \texttt{\mm{}html} option). It is mainly useful to specify where the
+  file \texttt{ocamlweb.sty} is to be found, when not installed in the
+  \texttt{hevea} library directory, using \texttt{\mm{}hevea-option
+  "-I }\textit{dir}\texttt{"}.
+
+\item[\texttt{\mm{}extern-defs}] ~\par
+
+  Keeps the external definitions in the index i.e. the identifiers
+  which are not defined in any part of the code. (The default behavior
+  is to suppress them from the index, even if they are used somewhere
+  in the code.)
+
+\item[\texttt{\mm{}header}] ~\par
+
+  Does not skip the header of \Caml\ files. The default behavior is to
+  skip them, since there are usually made of copyright and license
+  informations, which you do not want to see in the final document.
+  Headers are identified as comments right at the beginning of the
+  \Caml\ file, and are stopped by any character other then a space
+  outside a comment or by an empty line. 
+
+\item[\texttt{\mm{}no-preamble}] ~\par
+
+  Suppresses the header and trailer of the final document. Thus, you can
+  insert the resulting document into a larger one.
+
+\item[\texttt{-p} \textit{string}, \texttt{\mm{}preamble} \textit{string}]~\par
+
+  Insert some material in the \LaTeX\ preamble, right before
+  \verb!\begin{document}!. See also the control \texttt{(*p}.
+
+\item[\texttt{\mm{}class-options }\textit{options}] ~\par
+
+  Sets the \LaTeX\ document class options; it defaults to \verb!12pt!.
+
+\item[\texttt{\mm{}latex-option }\textit{option}] ~\par
+
+  Passes the given option the \LaTeX\ package \texttt{ocamlweb.sty}. 
+
+\item[\texttt{\mm{}old-fullpage}] ~ \par
+  
+  Uses the old version of the \LaTeX\ \texttt{fullpage} package, i.e.
+  with no option. Otherwise option \texttt{headings} is used.
+
+\item[\texttt{\mm{}impl }\textit{file}, \texttt{\mm{}intf }\textit{file}, 
+      \texttt{\mm{}tex }\textit{file}] ~\par
+
+  Considers the file `\textit{file}' respectively as a \verb!.ml! file, a
+  \verb!.mli! file or a \verb!.tex! file.
+
+\item[\texttt{\mm{}files }\textit{file}] ~\par
+
+  Read file names to process in file `\textit{file}' as if they were
+  given on the command line. Useful for program sources splitted in
+  several directories. See FAQ.
+  
+\item[\texttt{\mm{}no-greek}] ~\par
+  
+  Disable use of greek letters for single-letter type variables. For
+  example, the declaration of \verb|List.hd| is displayed as
+  \begin{quote}
+    \textit{List.hd} : $\alpha$ \textit{list} $\rightarrow$
+    $\alpha$
+  \end{quote}
+  but with this option, it will be displayed as
+  \begin{quote}
+    \textit{List.hd} : \textit{'a} \textit{list} $\rightarrow$
+    \textit{'a}
+  \end{quote}
+
+\item[\texttt{-q}, \texttt{\mm{}quiet}] ~\par
+
+  Be quiet. Do not print anything on standard error output except errors.
+
+\item[\texttt{-h}, \texttt{\mm{}help}] ~\par
+
+  Gives a short summary of the options and exits.
+
+\item[\texttt{-v}, \texttt{\mm{}version}] ~\par
+
+  Prints the version and exits.
+
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The \texttt{ocamlweb} \LaTeX{} style file}
+\label{section:ocamlweb.sty}
+
+In case you choose to produce a document without the default \LaTeX{}
+preamble (by using option \verb|--no-preamble|), then you must insert
+into your own preamble the command
+\begin{quote}
+  \verb|\usepackage[|\textit{options}\verb|]{ocamlweb}|
+\end{quote}
+Alternatively, you may also pass these options with the
+\verb|--latex-options| option of the \verb|ocamlweb| command.
+
+The options that you may pass to the package are the following:
+
+\begin{description}
+
+\item[\texttt{noweb}] ~
+  
+  Tells \verb|ocamlweb.sty| that the document was generated with the
+  \verb|--noweb| option so that no WEB sections are used, and
+  the index was generated by referencing the \LaTeX\ sections,
+  subsections, etc.
+
+\item[\texttt{novisiblespaces}] ~
+  
+  By default, spaces in strings of CAML code parts are output as
+  \texttt{\char`\ }. They will be output as real spaces if you select
+  this option.
+
+\item[\texttt{bypages} / \texttt{bysections}] ~
+  
+  When not in WEB sectioning style, these options
+  specify whether the index must refer to page numbers or section numbers.
+  \texttt{bypages} is the default.
+  In WEB sectioning style, this option has no effect.
+
+\end{description}
+
+Additionally, you may alter the rendering of the document by
+redefining some macros:
+\begin{description}
+
+\item[\texttt{ocwkw}, \texttt{ocwbt}, \texttt{ocwupperid},
+  \texttt{ocwlowerid}, \texttt{ocwtv}] ~ 
+  
+  The one-argument macros to typeset keywords, base types (such
+  as \verb|int|, \verb|string|, etc.), uppercase identifiers (type
+  constructors, exception names, module names), lowercase identifiers
+  and type variables respectively. Defaults are sans-serif for
+  keywords and italic for all others. Some of the single-letter type
+  variables are displayed by default as greek letters, but this
+  behaviour can be selected by the \verb|--no-greek| option.
+
+  For example, if you would like a slanted font for base types, you
+  may insert  
+\begin{verbatim}
+     \renewcommand{\ocwbt}[1]{\textsl{#1}}
+\end{verbatim}
+  anywhere between \verb|\usepackage{ocamlweb}| and
+  \verb|\begin{document}|. 
+
+\item[\texttt{ocwlexkw}, \texttt{ocwlexident}, \texttt{ocwyacckw},
+  \texttt{ocwyaccident}] ~
+
+  Analogous macros as above, to typeset lex keywords, lex identifiers,
+  yacc keywords and yacc identifiers respectively.
+
+\item[\texttt{ocwinterface}, \texttt{ocwmodule},
+  \texttt{ocwinterfacepart}, \texttt{ocwcodepart}] ~ 
+  
+  One-argument macros for typesetting the title of a \verb|.mli| file,
+  the title of a \verb|.ml| file, the interface part of a \verb|.ml|
+  file and the code part of a \verb|.ml| file, respectively. Defaults
+  are is
+\begin{verbatim}
+\newcommand{\ocwinterface}[1]{\section*{Interface for module #1}}
+\newcommand{\ocwmodule}[1]{\section*{Module #1}}
+\newcommand{\ocwinterfacepart}{\subsection*{Interface}}
+\newcommand{\ocwcodepart}{\subsection*{Code}}
+\end{verbatim}
+  and you may redefine them using \verb|\renewcommand|.
+
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{FAQ}
+
+\begin{enumerate}
+
+\item \textbf{What about an HTML output?} ~\par
+
+  Use \textsf{hevea}, the \LaTeX\ to HTML translator written by Luc
+  Maranget (freely available at
+  \monurl{\url{http://pauillac.inria.fr/hevea/}}), 
+  with the following command-line:
+  \begin{displaymath}
+    \texttt{hevea} ~ \texttt{ocamlweb.sty} ~ \textit{file.tex}
+  \end{displaymath}
+  where \textit{file.tex} is the document produced by \ocamlweb.
+  The package \texttt{ocamlweb.sty} contains the necessary support for
+  \textsf{hevea}.
+
+\item \textbf{How can I customize the appearance of the final
+    document?} ~\par 
+
+  %Make your own version of the \LaTeX\ package
+  %\texttt{ocamlweb.sty}. There are macros for keywords, identifiers,
+  %index entries, etc. with short comments explaining their role.
+  % jcf, tu nous fais le coup a chaque fois: tu sais bien que ce n'est
+  % pas la bonne manière de faire car l'utilisateur ne peut plus se
+  % mettre a jour !
+  
+  You can redefine some of the \LaTeX{} macros of the
+  \verb|ocamlweb.sty| style file. See
+  Section~\ref{section:ocamlweb.sty}. We do not recommend to modify
+  the \verb|ocamlweb.sty| file directly, since you would not be able to
+  update easily to future versions. You should rather redefine the
+  macros using \verb|\renewcommand|. If you want to customize other
+  parameters that are not currently customizable, please contact the
+  developers.
+    
+\item \textbf{How can I insert `usepackage' commands, or whatever else,
+  in the \LaTeX\ preamble?} ~\par
+
+  Use the option \texttt{-p} or the corresponding control \texttt{(*p}.
+
+  If you really want a different \LaTeX\ preamble, for instance to use
+  a \LaTeX\ class other than \texttt{article}, then 
+  use the option \texttt{\mm{}no-preamble} and catenate the result with your
+  own header and trailer (or use a \verb|\input| or \verb|\include|
+  command to insert the file generated by \ocamlweb\ in your main
+  \LaTeX\ file.)
+
+\item \textbf{How can I use square brackets in \LaTeX, since they are
+    reserved characters for \ocamlweb?} ~\par
+  
+  There is no escape sequence for the moment. But there is an easy
+  solution to this problem: define macros for your \LaTeX\ notations
+  involving square brackets and put them in the preamble or in a
+  \verb|.tex| file that you will provide on the \ocamlweb\ command
+  line. Then, there is no longer square brackets in your source
+  comments, but only calls to these macros.
+
+\item \textbf{What about lexers and parsers?} ~\par
+  
+  There is support for \textsf{ocamllex} lexers and \textsf{ocamlyacc}
+  parsers since version 0.9. They are recognized by their suffix on
+  the command line (do not use option \verb!--impl! anymore).
+
+\item \textbf{I would like my pattern-matching right-hand sides to be
+    aligned. Is it possible?} ~\par
+
+  No, it is not, since \ocamlweb\ uses proportional fonts. But you
+  can still align your pattern-matching in your source files, since
+  \ocamlweb\ converts multiple spaces into single ones.
+
+\item \textbf{What can I do with a large program with sources in several
+    directories, organised as libraries?} ~
+
+  First alternative: you can run an ocamlweb command in each
+  directories, producing a documentation for each library. If you want
+  to have the documentations alltogether in the same TeX file, run
+  each ocamlweb commands with option \texttt{\mm{}no-preamble} to avoid
+  generation of the \LaTeX\ preamble, build by hand a master document
+  file with the preamble you want, without forgetting the
+  \verb|\usepackage{ocamlweb}|, and input each file in each directory
+  with the \verb|\input| or the \verb|\include| macro.
+  
+  Second alternative: the main problem with the first alternative is
+  that you will have an separate index for each libraries. If you want
+  a global index, you need the run only one \verb|ocamlweb| command.
+  If you don't want to put all source file names on one single command
+  line, you can use the \verb|--files| option which allows you to read
+  the source file names from a file. Example :
+\begin{verbatim}
+    ocamlweb --files lib1/source-files --files lib2/source-files
+\end{verbatim}
+  will produce documentation for files in \verb|lib1| and \verb|lib2|
+  provided that the files \verb|source-files| in each directory
+  contain the name of the documented source files.
+
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

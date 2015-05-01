@@ -1,0 +1,6 @@
+
+This directory contains the ocaml parser, copied `as is' from the
+ocaml sources. All this code is copyright 1996 "Institut National de
+Recherche en Informatique et en Automatique" and distributed under the
+terms of the Q Public License version 1.0 (enclosed in the file LICENSE).
+

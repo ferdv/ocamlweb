@@ -1,0 +1,290 @@
+
+# where to install the binaries
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR=@bindir@
+
+# where to install the man page
+MANDIR=@mandir@
+
+# where to install the style file
+BASETEXDIR = $(prefix)/share/texmf
+TEXDIR = $(BASETEXDIR)/tex/latex/misc 
+
+# command to update TeX' kpathsea database
+MKTEXLSR = @MKTEXLSR@
+UPDATETEX = $(MKTEXLSR) /usr/share/texmf /var/spool/texmf $(BASETEXDIR) > /dev/null
+
+# Version
+# ATTENTION A BIEN UTILISER UN NUMERO DE VERSION DE LA FORME X.YY
+# (requete de Ralf pour la Debian)
+MAJORVN=1
+MINORVN=38
+VERSION=$(MAJORVN).$(MINORVN)
+
+OCAMLBEST=@OCAMLBEST@
+
+CAMLC    = @OCAMLC@
+CAMLCOPT = @OCAMLOPT@
+CAMLDEP  = @OCAMLDEP@
+
+ZLIBS    = -I ocaml-parser -I ocamllex-parser
+DEBUG    = 
+PROFILE  =
+BYTEFLAGS= $(ZLIBS) $(DEBUG)
+OPTFLAGS = $(ZLIBS) $(PROFILE)
+
+CAML_CMO = ocaml-parser/misc.cmo ocaml-parser/clflags.cmo	\
+	   ocaml-parser/terminfo.cmo ocaml-parser/warnings.cmo	\
+           ocaml-parser/linenum.cmo ocaml-parser/location.cmo	\
+	   ocaml-parser/longident.cmo \
+           ocaml-parser/syntaxerr.cmo ocaml-parser/parser.cmo	\
+           ocaml-parser/lexer.cmo ocaml-parser/parse.cmo
+
+CAML_CMX = $(CAML_CMO:.cmo=.cmx)
+
+CAMLLEX_CMO = ocamllex-parser/lex_parser.cmo ocamllex-parser/lex_lexer.cmo 
+
+CAMLLEX_CMX = $(CAMLLEX_CMO:.cmo=.cmx)
+
+CMO = output.cmo yacc_syntax.cmo yacc_parser.cmo yacc_lexer.cmo cross.cmo pretty.cmo \
+      web.cmo doclexer.cmo \
+      version.cmo main.cmo
+
+CMX = $(CMO:.cmo=.cmx)
+
+all: @OCAMLBEST@
+
+opt: ocamlweb
+
+byte: ocamlweb.byte
+
+ocamlweb: $(CAML_CMX) $(CAMLLEX_CMX) $(CMX)
+	$(CAMLCOPT) $(OPTFLAGS) -o $@ $(CAML_CMX) $(CAMLLEX_CMX) $(CMX)
+	strip ocamlweb
+
+ocamlweb.byte: $(CAML_CMO) $(CAMLLEX_CMO) $(CMO)
+	$(CAMLC) $(BYTEFLAGS) -o $@ $(CAML_CMO) $(CAMLLEX_CMO) $(CMO)
+
+ocamlweb.static: $(CAML_CMX) $(CAMLLEX_CMX) $(CMX)
+	$(CAMLCOPT) $(OPTFLAGS) -cclib -static -o $@ $(CAML_CMX) $(CAMLLEX_CMX) $(CMX)
+	strip $@
+
+debug: $(CAML_CMO) $(CAMLLEX_CMO) $(CMO)
+	$(CAMLC) $(BYTEFLAGS) -o ocamlweb-debug $(CAML_CMO) $(CAMLLEX_CMO) $(CMO)
+
+version.ml: Makefile
+	echo "let version = \""$(VERSION)"\"" > version.ml
+	echo "let date = \""`date`"\"" >> version.ml
+
+install-indep:
+	mkdir -p $(BINDIR)
+	mkdir -p $(MANDIR)/man1
+	cp doc/ocamlweb.1 $(MANDIR)/man1
+	mkdir -p $(TEXDIR)
+	cp ocamlweb.sty $(TEXDIR)	
+	$(UPDATETEX)
+
+install: install-indep
+	if test @OCAMLBEST@ = opt ; then \
+		cp ocamlweb $(BINDIR) ; \
+	else \
+		cp ocamlweb.byte $(BINDIR)/ocamlweb ; \
+	fi
+
+install-byte: install-indep
+	cp ocamlweb.byte $(BINDIR)/ocamlweb
+
+local: ocamlweb
+	cp ocamlweb $$HOME/bin/$$OSTYPE
+	cp doc/ocamlweb.1 $$HOME/man/man1
+	cp ocamlweb.sty $$HOME/tex/inputs
+
+install-demons: ocamlweb.static
+	cp ocamlweb.static /users/demons/demons/bin/$$OSTYPE/ocamlweb
+	cp doc/ocamlweb.1 /users/demons/demons/man/man1
+	cp ocamlweb.sty /users/demons/demons/tex/inputs
+
+manual:
+	make -C doc VERSION=$(VERSION) all
+
+LATEX=TEXINPUTS=..: ; export TEXINPUTS ; latex
+
+TESTFILES=test/test.mli test/test.ml test/test_lex.mll test/test_yacc.mly
+
+test/test.tex: ocamlweb $(TESTFILES)
+	./ocamlweb $(TESTFILES) -o test/test.tex
+
+.PHONY: test
+
+test: ocamlweb.sty test/test.tex
+	cd test; $(LATEX) test 
+	cd test ; grep -q "Rerun" test.log && ($(LATEX) test) || true
+	- cd test ; hevea -o test.html ../ocamlweb.sty test.tex
+	xdvi test/test.dvi
+
+BOOTSTRAP= bootstrap.tex output.mli output.ml \
+	   yacc_parser.mly yacc_lexer.mll cross.mli cross.ml \
+           pretty.mli pretty.mll \
+	   web.mli web.ml doclexer.mli doclexer.mll main.ml 
+
+bootstrap: ocamlweb
+	./ocamlweb -o test/ocamlweb.tex $(BOOTSTRAP)
+	cd test; $(LATEX) ./ocamlweb
+	cd test; grep -q "Rerun" ocamlweb.log && ($(LATEX) ./ocamlweb) || true
+	- cd test; hevea -o ocamlweb.html ../ocamlweb.sty ocamlweb.tex
+	cd test; dvips ocamlweb.dvi -o ocamlweb.ps
+
+check: bootstrap
+
+# export
+########
+
+NAME=ocamlweb-$(VERSION)
+
+FTP = $(HOME)/ftp/ocamlweb
+WWW = $(HOME)/WWW/ocamlweb
+
+FILES = *.ml* ocamlweb.sty bootstrap.tex				\
+	Makefile.in configure.in configure .depend \
+	README INSTALL COPYING LGPL CHANGES
+
+OCAMLFILES = misc.mli misc.ml clflags.ml	\
+        terminfo.mli terminfo.ml		\
+	warnings.mli warnings.ml		\
+	linenum.mli linenum.mll			\
+	location.mli location.ml		\
+	longident.mli longident.ml		\
+	syntaxerr.mli syntaxerr.ml		\
+	asttypes.mli parsetree.mli		\
+	parser.mly				\
+	lexer.mli lexer.mll			\
+	parse.mli parse.ml			\
+	README LICENSE
+
+OCAMLLEXFILES = lex_syntax.mli lex_parser.mly lex_lexer.mll
+
+DOCFILES = doc/$(NAME)-man.tex doc/$(NAME)-man.html doc/ocamlweb.1
+
+export: source linux
+	cp README COPYING LGPL CHANGES $(FTP)
+	make -C doc VERSION=$(VERSION) all export
+	make export-bootstrap
+	mail -s "nouvelle release d'ocamlweb" treinen@debian.org < /dev/null
+
+export-bootstrap: bootstrap
+	gzip -c test/ocamlweb.ps > $(FTP)/ocamlweb.ps.gz
+	cp test/ocamlweb.html $(FTP)
+
+source: clean manual
+	mkdir -p export/$(NAME)/test
+	cd export/$(NAME); mkdir -p ocaml-parser; mkdir -p ocamllex-parser; mkdir -p test; \
+	  mkdir -p doc; mkdir -p support
+	cp $(FILES) export/$(NAME)
+	cp $(DOCFILES) export/$(NAME)/doc
+	cd ocaml-parser; cp $(OCAMLFILES) ../export/$(NAME)/ocaml-parser
+	cd ocamllex-parser; cp $(OCAMLLEXFILES) ../export/$(NAME)/ocamllex-parser
+	cd support; cp config.guess config.sub install-sh \
+	  ../export/$(NAME)/support
+	cd export ; tar cf $(NAME).tar $(NAME) ; \
+	  gzip -f --best $(NAME).tar
+	cp export/$(NAME).tar.gz $(FTP)
+
+BINARY = $(NAME)-$(OSTYPE)
+
+linux: clean binary
+
+solaris:
+	rmake sun-demons $(HOME)/soft/ocaml/ocamlweb clean binary
+
+BINARYFILES = README INSTALL COPYING LGPL ocamlweb ocamlweb.sty
+
+binary: ocamlweb manual
+	mkdir -p export/$(BINARY)/doc
+	cp $(BINARYFILES) export/$(BINARY)
+	cp $(DOCFILES) export/$(BINARY)/doc
+	(cd export; tar czf $(BINARY).tar.gz $(BINARY))
+	cp export/$(BINARY).tar.gz $(FTP)
+
+# generic rules :
+#################
+
+.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll
+
+.mll.ml:
+	ocamllex $<
+
+.mli.cmi:
+	$(CAMLC) -c $(BYTEFLAGS) $<
+
+.ml.cmo:
+	$(CAMLC) -c $(BYTEFLAGS) $<
+
+.ml.o:
+	$(CAMLCOPT) -c $(OPTFLAGS) $<
+
+.ml.cmx:
+	$(CAMLCOPT) -c $(OPTFLAGS) $<
+
+ocaml-parser/parser.mli ocaml-parser/parser.ml: ocaml-parser/parser.mly
+	ocamlyacc -v ocaml-parser/parser.mly
+
+yacc_parser.mli yacc_parser.ml: yacc_parser.mly
+	ocamlyacc -v yacc_parser.mly
+
+ocamllex-parser/lex_parser.mli ocamllex-parser/lex_parser.ml: ocamllex-parser/lex_parser.mly
+	ocamlyacc -v ocamllex-parser/lex_parser.mly
+
+# Emacs tags
+############
+
+tags:
+	etags "--regex=/let[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/let[ \t]+rec[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/and[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/type[ \t]+\([^ \t]+\)/\1/" \
+              "--regex=/exception[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/val[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex=/module[ \t]+\([^ \t]+\)/\1/" *.mli *.ml
+
+# myself
+
+Makefile: Makefile.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck
+
+configure: configure.in
+	autoconf 
+
+# clean and depend
+##################
+
+GENERATED = doclexer.ml pretty.ml version.ml yacc_lexer.ml \
+	    yacc_parser.ml yacc_parser.mli yacc_parser.output \
+            ocaml-parser/lexer.ml ocaml-parser/linenum.ml \
+	    ocaml-parser/parser.mli ocaml-parser/parser.ml \
+	    ocamllex-parser/lex_lexer.ml ocamllex-parser/lex_parser.ml \
+	    ocamllex-parser/lex_parser.mli
+
+clean:
+	rm -f *~ *.cm[iox] *.o 
+	rm -f ocaml-parser/*~ ocaml-parser/*.cm[iox] ocaml-parser/*.o
+	rm -f ocamllex-parser/*~ ocamllex-parser/*.cm[iox] ocamllex-parser/*.o
+	rm -f ocamlweb ocamlweb.byte
+	rm -f $(GENERATED)
+	rm -f yacc-parser.output ocaml-parser/parser.output
+	rm -f ocamllex-parser/lex_parser.output
+	cd test; rm -f *.aux *.log *.dvi *.ps *.tex
+
+dist-clean:: clean
+	rm -f Makefile
+	rm -f config.status config.cache config.log
+
+depend: $(GENERATED)
+	rm -f .depend
+	ocamldep $(ZLIBS) *.mli *.ml ocaml-parser/*.ml ocaml-parser/*.mli ocamllex-parser/*.ml ocamllex-parser/*.mli > .depend
+
+include .depend
+

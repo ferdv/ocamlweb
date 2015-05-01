@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>ocamlweb-1.38-man</TITLE>
+
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META name="GENERATOR" content="hevea 1.10">
+<STYLE type="text/css">
+.li-itemize{margin:1ex 0ex;}
+.li-enumerate{margin:1ex 0ex;}
+.dd-description{margin:0ex 0ex 1ex 4ex;}
+.dt-description{margin:0ex;}
+.toc{list-style:none;}
+.thefootnotes{text-align:left;margin:0ex;}
+.dt-thefootnotes{margin:0em;}
+.dd-thefootnotes{margin:0em 0em 0em 2em;}
+.footnoterule{margin:1em auto 1em 0px;width:50%;}
+.caption{padding-left:2ex; padding-right:2ex; margin-left:auto; margin-right:auto}
+.title{margin:2ex auto;text-align:center}
+.center{text-align:center;margin-left:auto;margin-right:auto;}
+.flushleft{text-align:left;margin-left:0ex;margin-right:auto;}
+.flushright{text-align:right;margin-left:auto;margin-right:0ex;}
+DIV TABLE{margin-left:inherit;margin-right:inherit;}
+PRE{text-align:left;margin-left:0ex;margin-right:auto;}
+BLOCKQUOTE{margin-left:4ex;margin-right:4ex;text-align:left;}
+TD P{margin:0px;}
+.boxed{border:1px solid black}
+.textboxed{border:1px solid black}
+.vbar{border:none;width:2px;background-color:black;}
+.hbar{border:none;height:2px;width:100%;background-color:black;}
+.hfill{border:none;height:1px;width:200%;background-color:black;}
+.vdisplay{border-collapse:separate;border-spacing:2px;width:auto; empty-cells:show; border:2px solid red;}
+.vdcell{white-space:nowrap;padding:0px;width:auto; border:2px solid green;}
+.display{border-collapse:separate;border-spacing:2px;width:auto; border:none;}
+.dcell{white-space:nowrap;padding:0px;width:auto; border:none;}
+.dcenter{margin:0ex auto;}
+.vdcenter{border:solid #FF8000 2px; margin:0ex auto;}
+.minipage{text-align:left; margin-left:0em; margin-right:auto;}
+.marginpar{border:solid thin black; width:20%; text-align:left;}
+.marginparleft{float:left; margin-left:0ex; margin-right:1ex;}
+.marginparright{float:right; margin-left:1ex; margin-right:0ex;}
+.theorem{text-align:left;margin:1ex auto 1ex 0ex;}
+.part{margin:2ex auto;text-align:center}
+</STYLE>
+</HEAD>
+<BODY >
+<!--HEVEA command line is: /usr/bin/hevea ocamlweb-man.tex -o ocamlweb-1.38-man.html -->
+<!--CUT DEF section 1 --><TABLE CLASS="title"><TR><TD><H1 CLASS="titlemain">ocamlweb: a literate programming tool<BR>
+ for Objective Caml</H1><H3 CLASS="titlerest">Jean-Christophe Filliâtre and Claude Marché<BR>
+ <A HREF="http://www.lri.fr/~filliatr/ocamlweb"><TT>http://www.lri.fr/~filliatr/ocamlweb</TT></A></H3></TD></TR>
+</TABLE><!--TOC section Contents-->
+<H2 CLASS="section"><!--SEC ANCHOR -->Contents</H2><!--SEC END --><!--TOC section Introduction-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc1">1</A>  Introduction</H2><!--SEC END --><P>Literate programming has been introduced by D. E. Knuth in 1984. The
+main idea is to put the code and its documentation in the same file and
+to produce from it a document which is readable by a human, and not
+only by a machine.
+Although <FONT COLOR=purple>ocamlweb</FONT> borrows a lot of ideas from Knuth&#X2019;s original tool
+(called <FONT COLOR=purple>WEB</FONT>), there are big differences between them. First, <FONT COLOR=purple>WEB</FONT> 
+allows you to present the pieces of your code in any order, and this
+is quite useful when using poorly structured languages, like
+<FONT COLOR=purple>Pascal</FONT> or <FONT COLOR=purple>C</FONT>. But <FONT COLOR=purple>Objective Caml</FONT> is already highly
+structured, and this is no more useful. Moreover, <FONT COLOR=purple>WEB</FONT> requires the
+use of a tool to produce the code from the <FONT COLOR=purple>WEB</FONT> file, which greatly
+complicates the use of your favorite source-based tools (dependencies
+generator, debugger, emacs mode, etc.). When using <FONT COLOR=purple>ocamlweb</FONT>, the
+documentation is inserted in the code as comments (in the <FONT COLOR=purple>Caml</FONT> 
+sense), and your code is not linked to the existence of <FONT COLOR=purple>ocamlweb</FONT> in
+any way.</P><P>Currently, the task of <FONT COLOR=purple>ocamlweb</FONT> may be seen as:
+</P><OL CLASS="enumerate" type=1><LI CLASS="li-enumerate">
+making a nice document with the code and its documentation;
+</LI><LI CLASS="li-enumerate">generating a global index of cross-references, where each
+identifier is associated to the lists of sections where it is
+defined or used.
+</LI></OL><!--TOC section Principles-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc2">2</A>  Principles</H2><!--SEC END --><P>Documentation is inserted into <FONT COLOR=purple>Caml</FONT> files as <EM>comments</EM>. Thus
+your files may compile as usual, whether you use <FONT COLOR=purple>ocamlweb</FONT> or not.
+<FONT COLOR=purple>ocamlweb</FONT> presupposes that the given <FONT COLOR=purple>Caml</FONT> files are well-formed (at
+least lexically, but also syntactically if you want the cross
+references to be correct). <FONT COLOR=purple>ocamlweb</FONT> understands each <FONT COLOR=purple>Caml</FONT> file as
+a sequence of paragraphs, each paragraph being either a piece of code or a
+piece of documentation. Documentation starts and ends with <FONT COLOR=purple>Caml</FONT> 
+comment&#X2019;s delimiters <TT>(*</TT> and <TT>*)</TT>, and is a regular
+L<sup>A</sup>T<sub>E</sub>X text. Code starts with any characters sequence other than
+<TT>(*</TT> and ends with an empty line.</P><P>Two styles are available for the final document:
+</P><UL CLASS="itemize"><LI CLASS="li-itemize">a <FONT COLOR=purple>WEB</FONT> style, where the code and documentation are displayed in
+<EM>sections</EM>, numbered consecutively starting from 1. A new
+section is started at the beginning of each file. You can also start
+a new section manually (see the paragraph below about controls);</LI><LI CLASS="li-itemize">a L<sup>A</sup>T<sub>E</sub>X style, where you structure your document as you like,
+using the usual sectioning commands of L<sup>A</sup>T<sub>E</sub>X. </LI></UL><!--TOC paragraph Escapings: code inside documentation and vice versa.-->
+<H5 CLASS="paragraph"><!--SEC ANCHOR -->Escapings: code inside documentation and vice versa.</H5><!--SEC END --><P>
+The first feature you will require is the ability to quote code inside
+documentation and conversely. The latter, namely documentation inside
+code, is simply obtained by normal <FONT COLOR=purple>Caml</FONT> comments filled in with a
+L<sup>A</sup>T<sub>E</sub>X contents. The former is obtained by quoting code between the
+delimiters <TT>[</TT> and <TT>]</TT>. Square brackets may be nested,
+the inner ones being understood as being part of the quoted code (thus
+you can quote a list expression like [1;2;3] by writing
+<TT>[[1;2;3]]</TT>). Inside quotations, the code is pretty-printed in
+the same way as it is in code parts.</P><!--TOC paragraph Controls.-->
+<H5 CLASS="paragraph"><!--SEC ANCHOR -->Controls.</H5><!--SEC END --><P>
+In addition to the default behavior of <FONT COLOR=purple>ocamlweb</FONT>, you can control it
+through a small set of commands, which are comments of a particular
+shape. These commands are the following:
+</P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>(*s</TT></B></DT><DD CLASS="dd-description">  <P>Starts a new section. (Meaningless in L<sup>A</sup>T<sub>E</sub>X style.)</P></DD><DT CLASS="dt-description"><B><TT>(*i</TT></B><B>   &#X2026;  </B><B><TT>i*)</TT></B></DT><DD CLASS="dd-description">  <P>Ignores all the text between those two delimiters. Such &#X201C;comments&#X201D;
+cannot be nested but any <FONT COLOR=purple>Caml</FONT> code and comments may appear between
+them, included nested <FONT COLOR=purple>Caml</FONT> comments. You can use those delimiters
+to enclose a comment that shouldn&#X2019;t appear in the document, but also
+to hide some <FONT COLOR=purple>Caml</FONT> code, putting it between <TT>(*i*)</TT> and
+<TT>(*i*)</TT> in such a way that your code still compiles but is
+ignored by <FONT COLOR=purple>ocamlweb</FONT>. (Notice that if you use the delimiters
+<TT>(*i</TT> and <TT>i*)</TT> directly, the text enclosed is commented
+for both <FONT COLOR=purple>Caml</FONT> and <FONT COLOR=purple>ocamlweb</FONT>.)</P></DD><DT CLASS="dt-description"><B><TT>(*c</TT></B></DT><DD CLASS="dd-description">  <P>Tells <FONT COLOR=purple>ocamlweb</FONT> that this is a real <FONT COLOR=purple>Caml</FONT> comment an not a
+documentation text. Mainly useful is you want to insert comments
+after empty lines. However, this is not the spirit of <FONT COLOR=purple>ocamlweb</FONT>, and
+you are encouraged to put the documentation in separate L<sup>A</sup>T<sub>E</sub>X 
+paragraphs and not in traditional <FONT COLOR=purple>Caml</FONT> comments.</P></DD><DT CLASS="dt-description"><B><TT>(*r</TT></B></DT><DD CLASS="dd-description">  <P>Justifies an end-of-line comment on the right margin.</P></DD><DT CLASS="dt-description"><B><TT>(*p</TT></B><B>   &#X2026;  </B><B><TT>*)</TT></B></DT><DD CLASS="dd-description">  <P>Insert some material in the L<sup>A</sup>T<sub>E</sub>X preamble. See also command line
+option <CODE>-p</CODE>.</P></DD></DL><!--TOC paragraph Pretty-printing.-->
+<H5 CLASS="paragraph"><!--SEC ANCHOR -->Pretty-printing.</H5><!--SEC END --><P> 
+<FONT COLOR=purple>ocamlweb</FONT> uses different faces for identifiers and keywords, and use
+mathematical symbols for some <FONT COLOR=purple>Caml</FONT> tokens. Here are the
+correspondences.
+</P><DIV CLASS="center">
+<TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP> <CODE>-&gt;</CODE></TD><TD ALIGN=left NOWRAP>&#X2192;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>&lt;-</CODE></TD><TD ALIGN=left NOWRAP>&#X2190;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>*</CODE></TD><TD ALIGN=left NOWRAP>×</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>&lt;=</CODE></TD><TD ALIGN=left NOWRAP>&#X2264;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>&gt;=</CODE></TD><TD ALIGN=left NOWRAP>&#X2265;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>~-</CODE></TD><TD ALIGN=left NOWRAP>&#X2212;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>&lt;&gt;</CODE></TD><TD ALIGN=left NOWRAP>&#X2260;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>==</CODE></TD><TD ALIGN=left NOWRAP>&#X2261;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>!=</CODE></TD><TD ALIGN=left NOWRAP>&#X2262;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>or</CODE>, <CODE>||</CODE></TD><TD ALIGN=left NOWRAP>&#X2228;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>&amp;</CODE>, <CODE>&amp;&amp;</CODE></TD><TD ALIGN=left NOWRAP>&#X2227;</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD><TD ALIGN=left NOWRAP> <CODE>not</CODE></TD><TD ALIGN=left NOWRAP>¬</TD><TD VALIGN=top ALIGN=center NOWRAP>        </TD></TR>
+</TABLE>
+</DIV><P>
+Integers and floating-point literals are pretty-printed like this:
+</P><DIV CLASS="center">
+<TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP> <CODE>123</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP>123</TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>0b010011</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP>010011<SUB>2</SUB></TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>0o466</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP>466<SUB>8</SUB></TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>0x3fff</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP><TT>3<I>fff</I></TT><SUB>16</SUB></TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>1.2e6</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP>1.2· 10<SUP>6</SUP></TD></TR>
+<TR><TD ALIGN=left NOWRAP> <CODE>1e-4</CODE></TD><TD VALIGN=top ALIGN=center NOWRAP>  &#X2192;  </TD><TD ALIGN=left NOWRAP>10<SUP>&#X2212;4</SUP></TD></TR>
+</TABLE>
+</DIV><P>
+Characters strings are pretty-printed in fixed-width
+font.
+</P><!--TOC section Hints to get a pretty document-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc3">3</A>  Hints to get a pretty document</H2><!--SEC END --><P><FONT COLOR=purple>ocamlweb</FONT> is rather robust, in the sense that it will always succeed
+in producing a document, as soon as the <FONT COLOR=purple>Caml</FONT> files are lexically
+correct. However, you may find the result rather ugly if so were your
+source files. Here are some style hints to get a pretty document.</P><P>First, <FONT COLOR=purple>ocamlweb</FONT> is not a real code pretty-printer: it does not
+indent your code, and it
+does not even cut your code lines when they are too long. The code
+will always appear formatted as it is in the source files. The
+indentation at the beggining of each line is output as a proportional
+space (tabulations are correctly translated). In particular, if you
+want your pattern-matchings to be aligned, you have to put a &#X2018;<CODE>|</CODE>&#X2019;
+also in front of the first pattern. Here is the difference:
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">  </TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>    <FONT COLOR=purple><I>let</I></FONT> <I><I>f</I></I> = <FONT COLOR=purple><I>function</I></FONT> </TD></TR>
+<TR><TD ALIGN=left NOWRAP>      <I><I>O</I></I> &#X2192; &#X2026; </TD></TR>
+<TR><TD ALIGN=left NOWRAP>     | (<I><I>S</I></I> <I>p</I>) &#X2192; &#X2026;</TD></TR>
+</TABLE></TD><TD CLASS="dcell">
+        
+</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>    <FONT COLOR=purple><I>let</I></FONT> <I><I>f</I></I> = <FONT COLOR=purple><I>function</I></FONT> </TD></TR>
+<TR><TD ALIGN=left NOWRAP>     | <I><I>O</I></I> &#X2192; &#X2026; </TD></TR>
+<TR><TD ALIGN=left NOWRAP>     | (<I><I>S</I></I> <I>p</I>) &#X2192; &#X2026;</TD></TR>
+</TABLE></TD></TR>
+</TABLE><!--TOC section Usage-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc4">4</A>  Usage</H2><!--SEC END --><P><FONT COLOR=purple>ocamlweb</FONT> is invoked on a shell command line as follows:
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">  <TT>ocamlweb </TT>&lt;<I>options and files</I>&gt;
+</TD></TR>
+</TABLE><P>
+Any command line argument which is not an option is considered to be a
+file (even if it starts with a <CODE>-</CODE>). <FONT COLOR=purple>Caml</FONT> files are identified
+by the suffixes <CODE>.ml</CODE> and <CODE>.mli</CODE>, and L<sup>A</sup>T<sub>E</sub>X files by the
+suffix <CODE>.tex</CODE>. The latter will be copied &#X2018;as is&#X2019; in the final
+document. The order of files on the command line is kept in the final
+document.</P><!--TOC subsection Command line options-->
+<H3 CLASS="subsection"><!--SEC ANCHOR -->Command line options</H3><!--SEC END --><DL CLASS="description"><DT CLASS="dt-description"><B><TT>-o </TT></B><B><I>file</I></B><B>, </B><B><TT>--output </TT></B><B><I>file</I></B></DT><DD CLASS="dd-description">  <P>Redirects the output into the file &#X2018;<I>file</I>&#X2019;.</P></DD><DT CLASS="dt-description"><B><TT>--noweb</TT></B></DT><DD CLASS="dd-description">  <P>In that case, there are no sections à la WEB, and the user
+structurates his document directly through L<sup>A</sup>T<sub>E</sub>X commands, like
+for instance <CODE>\section</CODE>, <CODE>\subsection</CODE>, etc. There is
+still an index, in the usual L<sup>A</sup>T<sub>E</sub>X sense. (Therefore, if you have
+introduced L<sup>A</sup>T<sub>E</sub>X sections and subsections, their numbers will
+appear in the index.)</P></DD><DT CLASS="dt-description"><B><TT>-s </TT></B><B>, </B><B><TT>--short</TT></B></DT><DD CLASS="dd-description">  <P>Do not insert titles for the files. The default behavior is to
+insert a title like &#X201C;Module Foo&#X201D; or &#X201C;Interface for module Foo&#X201D;
+for each file.</P></DD><DT CLASS="dt-description"><B><TT>--no-index</TT></B></DT><DD CLASS="dd-description">  <P>Do not output the index.</P></DD><DT CLASS="dt-description"><B><TT>--dvi</TT></B></DT><DD CLASS="dd-description">  <P>Output in DVI format, instead of L<sup>A</sup>T<sub>E</sub>X format. (You need <TT>latex</TT>
+to be installed and present in your path.)</P></DD><DT CLASS="dt-description"><B><TT>--ps</TT></B></DT><DD CLASS="dd-description">  <P>Output in PostScript format, instead of L<sup>A</sup>T<sub>E</sub>X format. (You need
+both <TT>latex</TT> and <TT>dvips</TT> to be installed and present
+in your path.)</P></DD><DT CLASS="dt-description"><B><TT>--html</TT></B></DT><DD CLASS="dd-description">  <P>Output in HTML format, instead of L<sup>A</sup>T<sub>E</sub>X format. (You need
+both <TT>latex</TT> and <TT>hevea</TT> to be installed and present
+in your path.)</P></DD><DT CLASS="dt-description"><B><TT>--hevea-option </TT></B><B><I>option</I></B></DT><DD CLASS="dd-description">  <P>Passes the given option to <TT>hevea</TT> (to be used with the
+<TT>--html</TT> option). It is mainly useful to specify where the
+file <TT>ocamlweb.sty</TT> is to be found, when not installed in the
+<TT>hevea</TT> library directory, using <TT>--hevea-option
+"-I </TT><I>dir</I><TT>"</TT>.</P></DD><DT CLASS="dt-description"><B><TT>--extern-defs</TT></B></DT><DD CLASS="dd-description">  <P>Keeps the external definitions in the index i.e. the identifiers
+which are not defined in any part of the code. (The default behavior
+is to suppress them from the index, even if they are used somewhere
+in the code.)</P></DD><DT CLASS="dt-description"><B><TT>--header</TT></B></DT><DD CLASS="dd-description">  <P>Does not skip the header of <FONT COLOR=purple>Caml</FONT> files. The default behavior is to
+skip them, since there are usually made of copyright and license
+informations, which you do not want to see in the final document.
+Headers are identified as comments right at the beginning of the
+<FONT COLOR=purple>Caml</FONT> file, and are stopped by any character other then a space
+outside a comment or by an empty line. </P></DD><DT CLASS="dt-description"><B><TT>--no-preamble</TT></B></DT><DD CLASS="dd-description">  <P>Suppresses the header and trailer of the final document. Thus, you can
+insert the resulting document into a larger one.</P></DD><DT CLASS="dt-description"><B><TT>-p</TT></B><B> </B><B><I>string</I></B><B>, </B><B><TT>--preamble</TT></B><B> </B><B><I>string</I></B></DT><DD CLASS="dd-description"> <P>Insert some material in the L<sup>A</sup>T<sub>E</sub>X preamble, right before
+<CODE>\begin{document}</CODE>. See also the control <TT>(*p</TT>.</P></DD><DT CLASS="dt-description"><B><TT>--class-options </TT></B><B><I>options</I></B></DT><DD CLASS="dd-description">  <P>Sets the L<sup>A</sup>T<sub>E</sub>X document class options; it defaults to <CODE>12pt</CODE>.</P></DD><DT CLASS="dt-description"><B><TT>--latex-option </TT></B><B><I>option</I></B></DT><DD CLASS="dd-description">  <P>Passes the given option the L<sup>A</sup>T<sub>E</sub>X package <TT>ocamlweb.sty</TT>. </P></DD><DT CLASS="dt-description"><B><TT>--old-fullpage</TT></B></DT><DD CLASS="dd-description">   <P>Uses the old version of the L<sup>A</sup>T<sub>E</sub>X <TT>fullpage</TT> package, i.e.
+with no option. Otherwise option <TT>headings</TT> is used.</P></DD><DT CLASS="dt-description"><B><TT>--impl </TT></B><B><I>file</I></B><B>, </B><B><TT>--intf </TT></B><B><I>file</I></B><B>, 
+</B><B><TT>--tex </TT></B><B><I>file</I></B></DT><DD CLASS="dd-description">  <P>Considers the file &#X2018;<I>file</I>&#X2019; respectively as a <CODE>.ml</CODE> file, a
+<CODE>.mli</CODE> file or a <CODE>.tex</CODE> file.</P></DD><DT CLASS="dt-description"><B><TT>--files </TT></B><B><I>file</I></B></DT><DD CLASS="dd-description">  <P>Read file names to process in file &#X2018;<I>file</I>&#X2019; as if they were
+given on the command line. Useful for program sources splitted in
+several directories. See FAQ.</P></DD><DT CLASS="dt-description"><B><TT>--no-greek</TT></B></DT><DD CLASS="dd-description">  <P>Disable use of greek letters for single-letter type variables. For
+example, the declaration of <CODE>List.hd</CODE> is displayed as
+</P><BLOCKQUOTE CLASS="quote">
+<I>List.hd</I> : &#X3B1; <I>list</I> &#X2192;
+&#X3B1;
+</BLOCKQUOTE><P>
+but with this option, it will be displayed as
+</P><BLOCKQUOTE CLASS="quote">
+<I>List.hd</I> : <I>&#X2019;a</I> <I>list</I> &#X2192;
+<I>&#X2019;a</I>
+</BLOCKQUOTE></DD><DT CLASS="dt-description"><B><TT>-q</TT></B><B>, </B><B><TT>--quiet</TT></B></DT><DD CLASS="dd-description">  <P>Be quiet. Do not print anything on standard error output except errors.</P></DD><DT CLASS="dt-description"><B><TT>-h</TT></B><B>, </B><B><TT>--help</TT></B></DT><DD CLASS="dd-description">  <P>Gives a short summary of the options and exits.</P></DD><DT CLASS="dt-description"><B><TT>-v</TT></B><B>, </B><B><TT>--version</TT></B></DT><DD CLASS="dd-description">  <P>Prints the version and exits.</P></DD></DL><!--TOC section The <TT>ocamlweb</TT> L<sup>A</sup>T<sub>E</sub>X style file-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc5">5</A>  The <TT>ocamlweb</TT> L<sup>A</sup>T<sub>E</sub>X style file</H2><!--SEC END --><P>
+<A NAME="section:ocamlweb.sty"></A></P><P>In case you choose to produce a document without the default L<sup>A</sup>T<sub>E</sub>X
+preamble (by using option <CODE>--no-preamble</CODE>), then you must insert
+into your own preamble the command
+</P><BLOCKQUOTE CLASS="quote">
+<CODE>\usepackage[</CODE><I>options</I><CODE>]{ocamlweb}</CODE>
+</BLOCKQUOTE><P>
+Alternatively, you may also pass these options with the
+<CODE>--latex-options</CODE> option of the <CODE>ocamlweb</CODE> command.</P><P>The options that you may pass to the package are the following:</P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>noweb</TT></B></DT><DD CLASS="dd-description">  <P>Tells <CODE>ocamlweb.sty</CODE> that the document was generated with the
+<CODE>--noweb</CODE> option so that no WEB sections are used, and
+the index was generated by referencing the L<sup>A</sup>T<sub>E</sub>X sections,
+subsections, etc.</P></DD><DT CLASS="dt-description"><B><TT>novisiblespaces</TT></B></DT><DD CLASS="dd-description">  <P>By default, spaces in strings of CAML code parts are output as
+<TT> </TT>. They will be output as real spaces if you select
+this option.</P></DD><DT CLASS="dt-description"><B><TT>bypages</TT></B><B> / </B><B><TT>bysections</TT></B></DT><DD CLASS="dd-description">  <P>When not in WEB sectioning style, these options
+specify whether the index must refer to page numbers or section numbers.
+<TT>bypages</TT> is the default.
+In WEB sectioning style, this option has no effect.</P></DD></DL><P>Additionally, you may alter the rendering of the document by
+redefining some macros:
+</P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>ocwkw</TT></B><B>, </B><B><TT>ocwbt</TT></B><B>, </B><B><TT>ocwupperid</TT></B><B>,
+</B><B><TT>ocwlowerid</TT></B><B>, </B><B><TT>ocwtv</TT></B></DT><DD CLASS="dd-description">   <P>The one-argument macros to typeset keywords, base types (such
+as <CODE>int</CODE>, <CODE>string</CODE>, etc.), uppercase identifiers (type
+constructors, exception names, module names), lowercase identifiers
+and type variables respectively. Defaults are sans-serif for
+keywords and italic for all others. Some of the single-letter type
+variables are displayed by default as greek letters, but this
+behaviour can be selected by the <CODE>--no-greek</CODE> option.</P><P>For example, if you would like a slanted font for base types, you
+may insert 
+</P><PRE CLASS="verbatim">     \renewcommand{\ocwbt}[1]{\textsl{#1}}
+</PRE><P>anywhere between <CODE>\usepackage{ocamlweb}</CODE> and
+<CODE>\begin{document}</CODE>. </P></DD><DT CLASS="dt-description"><B><TT>ocwlexkw</TT></B><B>, </B><B><TT>ocwlexident</TT></B><B>, </B><B><TT>ocwyacckw</TT></B><B>,
+</B><B><TT>ocwyaccident</TT></B></DT><DD CLASS="dd-description">  <P>Analogous macros as above, to typeset lex keywords, lex identifiers,
+yacc keywords and yacc identifiers respectively.</P></DD><DT CLASS="dt-description"><B><TT>ocwinterface</TT></B><B>, </B><B><TT>ocwmodule</TT></B><B>,
+</B><B><TT>ocwinterfacepart</TT></B><B>, </B><B><TT>ocwcodepart</TT></B></DT><DD CLASS="dd-description">   <P>One-argument macros for typesetting the title of a <CODE>.mli</CODE> file,
+the title of a <CODE>.ml</CODE> file, the interface part of a <CODE>.ml</CODE>
+file and the code part of a <CODE>.ml</CODE> file, respectively. Defaults
+are is
+</P><PRE CLASS="verbatim">\newcommand{\ocwinterface}[1]{\section*{Interface for module #1}}
+\newcommand{\ocwmodule}[1]{\section*{Module #1}}
+\newcommand{\ocwinterfacepart}{\subsection*{Interface}}
+\newcommand{\ocwcodepart}{\subsection*{Code}}
+</PRE><P>and you may redefine them using <CODE>\renewcommand</CODE>.</P></DD></DL><!--TOC section FAQ-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc6">6</A>  FAQ</H2><!--SEC END --><OL CLASS="enumerate" type=1><LI CLASS="li-enumerate"><B>What about an HTML output?</B>  <P>Use <FONT COLOR=purple>hevea</FONT>, the L<sup>A</sup>T<sub>E</sub>X to HTML translator written by Luc
+Maranget (freely available at
+<A HREF="http://pauillac.inria.fr/hevea/"><TT>http://pauillac.inria.fr/hevea/</TT></A>), 
+with the following command-line:
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">    <TT>hevea</TT>   <TT>ocamlweb.sty</TT>   <I>file.tex</I>
+</TD></TR>
+</TABLE><P>
+where <I>file.tex</I> is the document produced by <FONT COLOR=purple>ocamlweb</FONT>.
+The package <TT>ocamlweb.sty</TT> contains the necessary support for
+<FONT COLOR=purple>hevea</FONT>.</P></LI><LI CLASS="li-enumerate"><B>How can I customize the appearance of the final
+document?</B>  <P>You can redefine some of the L<sup>A</sup>T<sub>E</sub>X macros of the
+<CODE>ocamlweb.sty</CODE> style file. See
+Section <A HREF="#section:ocamlweb.sty">5</A>. We do not recommend to modify
+the <CODE>ocamlweb.sty</CODE> file directly, since you would not be able to
+update easily to future versions. You should rather redefine the
+macros using <CODE>\renewcommand</CODE>. If you want to customize other
+parameters that are not currently customizable, please contact the
+developers.</P></LI><LI CLASS="li-enumerate"><B>How can I insert &#X2018;usepackage&#X2019; commands, or whatever else,
+in the L<sup>A</sup>T<sub>E</sub>X preamble?</B>  <P>Use the option <TT>-p</TT> or the corresponding control <TT>(*p</TT>.</P><P>If you really want a different L<sup>A</sup>T<sub>E</sub>X preamble, for instance to use
+a L<sup>A</sup>T<sub>E</sub>X class other than <TT>article</TT>, then 
+use the option <TT>--no-preamble</TT> and catenate the result with your
+own header and trailer (or use a <CODE>\input</CODE> or <CODE>\include</CODE>
+command to insert the file generated by <FONT COLOR=purple>ocamlweb</FONT> in your main
+L<sup>A</sup>T<sub>E</sub>X file.)</P></LI><LI CLASS="li-enumerate"><B>How can I use square brackets in L<sup>A</sup>T<sub>E</sub>X, since they are
+reserved characters for </B><B><FONT COLOR=purple>ocamlweb</FONT></B><B>?</B>  <P>There is no escape sequence for the moment. But there is an easy
+solution to this problem: define macros for your L<sup>A</sup>T<sub>E</sub>X notations
+involving square brackets and put them in the preamble or in a
+<CODE>.tex</CODE> file that you will provide on the <FONT COLOR=purple>ocamlweb</FONT> command
+line. Then, there is no longer square brackets in your source
+comments, but only calls to these macros.</P></LI><LI CLASS="li-enumerate"><B>What about lexers and parsers?</B>  <P>There is support for <FONT COLOR=purple>ocamllex</FONT> lexers and <FONT COLOR=purple>ocamlyacc</FONT>
+parsers since version 0.9. They are recognized by their suffix on
+the command line (do not use option <CODE>--impl</CODE> anymore).</P></LI><LI CLASS="li-enumerate"><B>I would like my pattern-matching right-hand sides to be
+aligned. Is it possible?</B>  <P>No, it is not, since <FONT COLOR=purple>ocamlweb</FONT> uses proportional fonts. But you
+can still align your pattern-matching in your source files, since
+<FONT COLOR=purple>ocamlweb</FONT> converts multiple spaces into single ones.</P></LI><LI CLASS="li-enumerate"><B>What can I do with a large program with sources in several
+directories, organised as libraries?</B>  <P>First alternative: you can run an ocamlweb command in each
+directories, producing a documentation for each library. If you want
+to have the documentations alltogether in the same TeX file, run
+each ocamlweb commands with option <TT>--no-preamble</TT> to avoid
+generation of the L<sup>A</sup>T<sub>E</sub>X preamble, build by hand a master document
+file with the preamble you want, without forgetting the
+<CODE>\usepackage{ocamlweb}</CODE>, and input each file in each directory
+with the <CODE>\input</CODE> or the <CODE>\include</CODE> macro.</P><P>Second alternative: the main problem with the first alternative is
+that you will have an separate index for each libraries. If you want
+a global index, you need the run only one <CODE>ocamlweb</CODE> command.
+If you don&#X2019;t want to put all source file names on one single command
+line, you can use the <CODE>--files</CODE> option which allows you to read
+the source file names from a file. Example :
+</P><PRE CLASS="verbatim">    ocamlweb --files lib1/source-files --files lib2/source-files
+</PRE><P>will produce documentation for files in <CODE>lib1</CODE> and <CODE>lib2</CODE>
+provided that the files <CODE>source-files</CODE> in each directory
+contain the name of the documented source files.</P></LI></OL><!--CUT END -->
+<!--HTMLFOOT-->
+<!--ENDHTML-->
+<!--FOOTER-->
+<HR SIZE=2><BLOCKQUOTE CLASS="quote"><EM>This document was translated from L<sup>A</sup>T<sub>E</sub>X by
+</EM><A HREF="http://hevea.inria.fr/index.html"><EM>H</EM><EM><FONT SIZE=2><sup>E</sup></FONT></EM><EM>V</EM><EM><FONT SIZE=2><sup>E</sup></FONT></EM><EM>A</EM></A><EM>.</EM></BLOCKQUOTE></BODY>
+</HTML>

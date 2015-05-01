@@ -1,0 +1,57 @@
+
+COMPILATION / INSTALLATION (source distribution)
+================================================
+
+  You need Objective Caml (>= 2.01) to compile the sources.
+ 
+  1. Use configure script by typing "./configure"
+
+     Default target directories are
+     
+       BINDIR = /usr/local/bin
+       TEXDIR = /usr/share/texmf/tex/latex/misc
+
+     You can change these values using the --prefix option of configure
+     (see ./configure --help)
+
+  2. Compile with "make". It creates a binary file "ocamlweb".
+
+  3. Install with "make install"
+
+     Note: For some TeX installations, it may be necessary to run the
+     command "mktexlsr" by hand to make ocamlweb.sty accessible by LaTeX.
+      
+     Alternatively, you may copy the needed files by hand: copy the binary 
+     file "ocamlweb" in some directory that exists in your PATH
+     environment variable, and copy the file "ocamlweb.sty" somewhere
+     in your LaTeX input path (one of the directories listed in
+     $TEXINPUTS). This file is needed to compile the documents
+     produced by ocamlweb with LaTeX.
+
+  4. (Optional) 
+
+     You can run "make check" to `bootstrap' ocamlweb i.e. to apply it to
+     its own code. If everything works fine, it will create a DVI document
+     test/ocamlweb.dvi.
+
+  5. Clean the sources with "make clean"
+
+
+INSTALLATION (binary distribution)
+==================================
+
+copy the binary file "ocamlweb" in some directory that exists in your
+PATH environment variable, and copy the file "ocamlweb.sty" somewhere
+in your LaTeX input path (one of the directories listed in
+$TEXINPUTS). This file is needed to compile the documents produced by
+ocamlweb with LaTeX.
+
+
+NOTE TO THE TexLive USERS
+=========================
+
+The LaTeX document produced by ocamlweb uses the 'fullpage' package
+(to get margins adapted to A4 paper). This package has been rewritten
+in the TeXLive and may cause bad DVI or PostScript (superposed
+texts). If so, please get the standard FULLPAGE.STY by H.Partl from
+http://www.ctan.org/.

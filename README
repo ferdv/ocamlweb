@@ -1,0 +1,20 @@
+ocamlweb is a literate programming tool for Objective Caml
+
+The invocation is
+
+	ocamlweb <options and files>
+
+It creates a single LaTeX document with both documentation and code
+(implementations and interfaces) extracted from the given files.
+Documentation is inserted into ocaml files as comments and thus your
+files will ever compile, no matter the fact you use ocamlweb or not.
+See the manual for options.
+
+
+COPYRIGHT
+=========
+
+This program is distributed under the GNU LGPL. 
+See the enclosed file COPYING.
+
+
