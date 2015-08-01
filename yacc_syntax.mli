@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(* $Id: yacc_syntax.mli,v 1.6 2002-02-01 09:40:05 marche Exp $ *)
+(* $Id$ *)
 
 (* locations for refering to CAML parts of yacc files *)
 

@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: output.mli,v 1.37 2004-09-23 09:20:16 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*s In that module, we concentrate all the printing functions.
    Thus, it will be easy to add another kind of output, HTML for instance,

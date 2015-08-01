@@ -10,7 +10,7 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: asttypes.mli,v 1.6 2004-10-12 12:29:19 filliatr Exp $ *)
+(* $Id$ *)
 
 (* Auxiliary a.s.t. types used by parsetree and typedtree. *)
 

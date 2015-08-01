@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: pretty.mll,v 1.42 2004-02-17 08:21:23 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 {
   open Printf

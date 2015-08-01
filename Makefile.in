@@ -9,7 +9,7 @@ MANDIR=@mandir@
 
 # where to install the style file
 BASETEXDIR = $(prefix)/share/texmf
-TEXDIR = $(BASETEXDIR)/tex/latex/misc 
+TEXDIR = $(BASETEXDIR)/tex/latex/misc
 
 # command to update TeX' kpathsea database
 MKTEXLSR = @MKTEXLSR@
@@ -19,7 +19,7 @@ UPDATETEX = $(MKTEXLSR) /usr/share/texmf /var/spool/texmf $(BASETEXDIR) > /dev/n
 # ATTENTION A BIEN UTILISER UN NUMERO DE VERSION DE LA FORME X.YY
 # (requete de Ralf pour la Debian)
 MAJORVN=1
-MINORVN=38
+MINORVN=39
 VERSION=$(MAJORVN).$(MINORVN)
 
 OCAMLBEST=@OCAMLBEST@
@@ -29,7 +29,7 @@ CAMLCOPT = @OCAMLOPT@
 CAMLDEP  = @OCAMLDEP@
 
 ZLIBS    = -I ocaml-parser -I ocamllex-parser
-DEBUG    = 
+DEBUG    =
 PROFILE  =
 BYTEFLAGS= $(ZLIBS) $(DEBUG)
 OPTFLAGS = $(ZLIBS) $(PROFILE)
@@ -43,7 +43,7 @@ CAML_CMO = ocaml-parser/misc.cmo ocaml-parser/clflags.cmo	\
 
 CAML_CMX = $(CAML_CMO:.cmo=.cmx)
 
-CAMLLEX_CMO = ocamllex-parser/lex_parser.cmo ocamllex-parser/lex_lexer.cmo 
+CAMLLEX_CMO = ocamllex-parser/lex_parser.cmo ocamllex-parser/lex_lexer.cmo
 
 CAMLLEX_CMX = $(CAMLLEX_CMO:.cmo=.cmx)
 
@@ -82,7 +82,7 @@ install-indep:
 	mkdir -p $(MANDIR)/man1
 	cp doc/ocamlweb.1 $(MANDIR)/man1
 	mkdir -p $(TEXDIR)
-	cp ocamlweb.sty $(TEXDIR)	
+	cp ocamlweb.sty $(TEXDIR)
 	$(UPDATETEX)
 
 install: install-indep
@@ -118,7 +118,7 @@ test/test.tex: ocamlweb $(TESTFILES)
 .PHONY: test
 
 test: ocamlweb.sty test/test.tex
-	cd test; $(LATEX) test 
+	cd test; $(LATEX) test
 	cd test ; grep -q "Rerun" test.log && ($(LATEX) test) || true
 	- cd test ; hevea -o test.html ../ocamlweb.sty test.tex
 	xdvi test/test.dvi
@@ -126,7 +126,7 @@ test: ocamlweb.sty test/test.tex
 BOOTSTRAP= bootstrap.tex output.mli output.ml \
 	   yacc_parser.mly yacc_lexer.mll cross.mli cross.ml \
            pretty.mli pretty.mll \
-	   web.mli web.ml doclexer.mli doclexer.mll main.ml 
+	   web.mli web.ml doclexer.mli doclexer.mll main.ml
 
 bootstrap: ocamlweb
 	./ocamlweb -o test/ocamlweb.tex $(BOOTSTRAP)
@@ -256,7 +256,7 @@ config.status: configure
 	./config.status --recheck
 
 configure: configure.in
-	autoconf 
+	autoconf
 
 # clean and depend
 ##################
@@ -269,7 +269,7 @@ GENERATED = doclexer.ml pretty.ml version.ml yacc_lexer.ml \
 	    ocamllex-parser/lex_parser.mli
 
 clean:
-	rm -f *~ *.cm[iox] *.o 
+	rm -f *~ *.cm[iox] *.o
 	rm -f ocaml-parser/*~ ocaml-parser/*.cm[iox] ocaml-parser/*.o
 	rm -f ocamllex-parser/*~ ocamllex-parser/*.cm[iox] ocamllex-parser/*.o
 	rm -f ocamlweb ocamlweb.byte

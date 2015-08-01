@@ -10,7 +10,7 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: syntaxerr.ml,v 1.6 2004-10-12 12:29:19 filliatr Exp $ *)
+(* $Id$ *)
 
 (* Auxiliary type for reporting syntax errors *)
 

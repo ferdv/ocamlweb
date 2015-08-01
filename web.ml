@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: web.ml,v 1.46 2003-01-31 16:51:46 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*i*)
 
@@ -33,6 +33,7 @@ type sub_paragraph =
  
 type paragraph =
   | Documentation of bool * int * string
+  | RawLaTeX of string
   | Code of int * string
   | LexYaccCode of int * (sub_paragraph list)
 
@@ -93,6 +94,8 @@ let print_sub_paragraph = function
 let print_paragraph = function 
   | Documentation (_,_,s) -> 
       print "Documentation" print_string s
+  | RawLaTeX (s) -> 
+      print "RawLaTeX" print_string s
   | Code (i,s) -> 
       Format.printf "Code(%d,@ %s)" i s
   | LexYaccCode (i,spl) -> 
@@ -181,6 +184,7 @@ let add_par_loc =
 	incr par_counter;
 	add_loc code_locations f (l,!par_counter)
     | Documentation _ -> ()
+    | RawLaTeX _ -> ()
 
 let add_sec_loc =
   let sec_counter = ref 0 in
@@ -276,7 +280,7 @@ let intervals l =
     | (acc, []) -> List.rev acc
     | (Interval (s1,(_,n2)) :: acc, (f,n) :: rem) when n = succ n2 -> 
 	group (Interval (s1,(f,n)) :: acc, rem)
-    | ((Single _)::(Single (f1,n1) as s1)::acc, (f,n)::rem) when n = n1 + 2 ->
+    | ((Single _)::(Single (f1,n1))::acc, (f,n)::rem) when n = n1 + 2 ->
 	group (Interval ((f1,n1),(f,n)) :: acc, rem)
     | (acc, (f,n) :: rem) ->
 	group ((Single (f,n)) :: acc, rem)
@@ -377,6 +381,10 @@ let pretty_print_paragraph is_first_paragraph is_last_paragraph f = function
       end_code ();
       pretty_print_doc is_first_paragraph (b,n,s);
       end_line()  (*i ajout Dorland-Muller i*)
+  | RawLaTeX s ->
+     end_code ();
+     output_string s;
+     end_line()
   | Code (l,s) ->
       if l > 0 then output_label (make_label_name (f,l));
       begin_code_paragraph ();
@@ -391,7 +399,7 @@ let pretty_print_paragraph is_first_paragraph is_last_paragraph f = function
 
 let pretty_print_section first f s = 
   if !web then begin_section ();
-  if first & s.sec_beg > 0 then output_label (make_label_name (f,0));
+  if first && s.sec_beg > 0 then output_label (make_label_name (f,0));
   output_label (make_label_name (f,s.sec_beg));
   let rec loop is_first_paragraph = function
     | [] ->

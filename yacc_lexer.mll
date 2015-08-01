@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: yacc_lexer.mll,v 1.6 2004-10-12 12:29:19 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 {
 

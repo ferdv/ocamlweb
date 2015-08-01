@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: doclexer.mli,v 1.5 2001-06-15 11:46:21 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*s Caml files are represented by the record [caml_file], which
     contains their file names and their module names. The functions

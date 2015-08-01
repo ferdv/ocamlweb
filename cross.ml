@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: cross.ml,v 1.31 2004-10-12 12:29:19 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*i*)
 open Lexing

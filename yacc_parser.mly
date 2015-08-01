@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  */
 
-/*i $Id: yacc_parser.mly,v 1.10 2004-10-12 12:29:19 filliatr Exp $ i*/
+/*i $Id$ i*/
 
 /*s In actions, we reuse the location type for lex files. */
 

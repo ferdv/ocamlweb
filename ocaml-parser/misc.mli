@@ -10,7 +10,7 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: misc.mli,v 1.6 2004-10-12 12:29:19 filliatr Exp $ *)
+(* $Id$ *)
 
 (* Miscellaneous useful types and functions *)
 

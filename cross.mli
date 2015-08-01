@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: cross.mli,v 1.12 2001-06-15 11:46:21 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*s That module exports to global tables [used] and [defined], indexed
    by identifiers (strings) and containing respectively the sets of locations

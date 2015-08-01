@@ -10,7 +10,7 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: terminfo.mli,v 1.5 2004-08-23 09:43:25 filliatr Exp $ *)
+(* $Id$ *)
 
 (* Basic interface to the terminfo database *)
 

@@ -10,7 +10,7 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: lex_lexer.mll,v 1.3 2004-10-12 12:29:19 filliatr Exp $ *)
+(* $Id$ *)
 
 (* The lexical analyzer for lexer definitions. Bootstrapped! *)
 

@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: pretty.mli,v 1.11 2002-10-11 15:41:43 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*s The following functions pretty-print the paragraphs of code and
     documentation, respectively. The boolean argument indicates

@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: main.ml,v 1.47 2004-09-23 09:20:16 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*i*)
 open Filename

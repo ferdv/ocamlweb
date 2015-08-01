@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: output.ml,v 1.65 2005-11-04 13:30:03 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (*i*)
 open Printf

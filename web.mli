@@ -14,7 +14,7 @@
  * (enclosed in the file LGPL).
  *)
 
-(*i $Id: web.mli,v 1.18 2002-10-11 15:41:43 filliatr Exp $ i*)
+(*i $Id$ i*)
 
 (* This module is the heart of the program. The only function is
    [produce_document], which takes a list of files and produces the
@@ -40,6 +40,7 @@ type sub_paragraph =
  
 type paragraph =
   | Documentation of bool * int * string
+  | RawLaTeX of string
   | Code of int * string
   | LexYaccCode of int * (sub_paragraph list)
 
