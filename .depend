@@ -47,52 +47,6 @@ ocaml-parser/ast_helper.cmx : ocaml-parser/parsetree.cmi \
     ocaml-parser/longident.cmx ocaml-parser/location.cmx \
     ocaml-parser/docstrings.cmx ocaml-parser/asttypes.cmi \
     ocaml-parser/ast_helper.cmi
-ocaml-parser/ast_invariants.cmo : ocaml-parser/syntaxerr.cmi \
-    ocaml-parser/parsetree.cmi ocaml-parser/longident.cmi \
-    ocaml-parser/builtin_attributes.cmi ocaml-parser/asttypes.cmi \
-    ocaml-parser/ast_iterator.cmi ocaml-parser/ast_invariants.cmi
-ocaml-parser/ast_invariants.cmx : ocaml-parser/syntaxerr.cmx \
-    ocaml-parser/parsetree.cmi ocaml-parser/longident.cmx \
-    ocaml-parser/builtin_attributes.cmx ocaml-parser/asttypes.cmi \
-    ocaml-parser/ast_iterator.cmx ocaml-parser/ast_invariants.cmi
-ocaml-parser/ast_iterator.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi ocaml-parser/ast_iterator.cmi
-ocaml-parser/ast_iterator.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmx ocaml-parser/ast_iterator.cmi
-ocaml-parser/ast_mapper.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmi ocaml-parser/longident.cmi \
-    ocaml-parser/location.cmi ocaml-parser/utils/clflags.cmi \
-    ocaml-parser/asttypes.cmi ocaml-parser/ast_helper.cmi \
-    ocaml-parser/ast_mapper.cmi
-ocaml-parser/ast_mapper.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmx ocaml-parser/longident.cmx \
-    ocaml-parser/location.cmx ocaml-parser/utils/clflags.cmx \
-    ocaml-parser/asttypes.cmi ocaml-parser/ast_helper.cmx \
-    ocaml-parser/ast_mapper.cmi
-ocaml-parser/attr_helper.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi ocaml-parser/asttypes.cmi \
-    ocaml-parser/attr_helper.cmi
-ocaml-parser/attr_helper.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmx ocaml-parser/asttypes.cmi \
-    ocaml-parser/attr_helper.cmi
-ocaml-parser/builtin_attributes.cmo : ocaml-parser/utils/warnings.cmi \
-    ocaml-parser/parsetree.cmi ocaml-parser/location.cmi \
-    ocaml-parser/asttypes.cmi ocaml-parser/ast_iterator.cmi \
-    ocaml-parser/builtin_attributes.cmi
-ocaml-parser/builtin_attributes.cmx : ocaml-parser/utils/warnings.cmx \
-    ocaml-parser/parsetree.cmi ocaml-parser/location.cmx \
-    ocaml-parser/asttypes.cmi ocaml-parser/ast_iterator.cmx \
-    ocaml-parser/builtin_attributes.cmi
-ocaml-parser/depend.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmi ocaml-parser/longident.cmi \
-    ocaml-parser/location.cmi ocaml-parser/utils/clflags.cmi \
-    ocaml-parser/builtin_attributes.cmi ocaml-parser/asttypes.cmi \
-    ocaml-parser/depend.cmi
-ocaml-parser/depend.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmx ocaml-parser/longident.cmx \
-    ocaml-parser/location.cmx ocaml-parser/utils/clflags.cmx \
-    ocaml-parser/builtin_attributes.cmx ocaml-parser/asttypes.cmi \
-    ocaml-parser/depend.cmi
 ocaml-parser/docstrings.cmo : ocaml-parser/utils/warnings.cmi \
     ocaml-parser/parsetree.cmi ocaml-parser/location.cmi \
     ocaml-parser/docstrings.cmi
@@ -133,22 +87,6 @@ ocaml-parser/parser.cmx : ocaml-parser/syntaxerr.cmx \
     ocaml-parser/location.cmx ocaml-parser/docstrings.cmx \
     ocaml-parser/utils/clflags.cmx ocaml-parser/asttypes.cmi \
     ocaml-parser/ast_helper.cmx ocaml-parser/parser.cmi
-ocaml-parser/pprintast.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmi ocaml-parser/longident.cmi \
-    ocaml-parser/location.cmi ocaml-parser/asttypes.cmi \
-    ocaml-parser/pprintast.cmi
-ocaml-parser/pprintast.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmx ocaml-parser/longident.cmx \
-    ocaml-parser/location.cmx ocaml-parser/asttypes.cmi \
-    ocaml-parser/pprintast.cmi
-ocaml-parser/printast.cmo : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmi ocaml-parser/longident.cmi \
-    ocaml-parser/location.cmi ocaml-parser/asttypes.cmi \
-    ocaml-parser/printast.cmi
-ocaml-parser/printast.cmx : ocaml-parser/parsetree.cmi \
-    ocaml-parser/utils/misc.cmx ocaml-parser/longident.cmx \
-    ocaml-parser/location.cmx ocaml-parser/asttypes.cmi \
-    ocaml-parser/printast.cmi
 ocaml-parser/syntaxerr.cmo : ocaml-parser/location.cmi \
     ocaml-parser/syntaxerr.cmi
 ocaml-parser/syntaxerr.cmx : ocaml-parser/location.cmx \
@@ -157,16 +95,8 @@ ocaml-parser/utils/clflags.cmo : ocaml-parser/utils/misc.cmi \
     ocaml-parser/utils/clflags.cmi
 ocaml-parser/utils/clflags.cmx : ocaml-parser/utils/misc.cmx \
     ocaml-parser/utils/clflags.cmi
-ocaml-parser/utils/identifiable.cmo : ocaml-parser/utils/misc.cmi \
-    ocaml-parser/utils/identifiable.cmi
-ocaml-parser/utils/identifiable.cmx : ocaml-parser/utils/misc.cmx \
-    ocaml-parser/utils/identifiable.cmi
 ocaml-parser/utils/misc.cmo : ocaml-parser/utils/misc.cmi
 ocaml-parser/utils/misc.cmx : ocaml-parser/utils/misc.cmi
-ocaml-parser/utils/numbers.cmo : ocaml-parser/utils/identifiable.cmi \
-    ocaml-parser/utils/numbers.cmi
-ocaml-parser/utils/numbers.cmx : ocaml-parser/utils/identifiable.cmx \
-    ocaml-parser/utils/numbers.cmi
 ocaml-parser/utils/terminfo.cmo : ocaml-parser/utils/terminfo.cmi
 ocaml-parser/utils/terminfo.cmx : ocaml-parser/utils/terminfo.cmi
 ocaml-parser/utils/warnings.cmo : ocaml-parser/utils/misc.cmi \
@@ -176,18 +106,7 @@ ocaml-parser/utils/warnings.cmx : ocaml-parser/utils/misc.cmx \
 ocaml-parser/ast_helper.cmi : ocaml-parser/parsetree.cmi \
     ocaml-parser/longident.cmi ocaml-parser/location.cmi \
     ocaml-parser/docstrings.cmi ocaml-parser/asttypes.cmi
-ocaml-parser/ast_invariants.cmi : ocaml-parser/parsetree.cmi
-ocaml-parser/ast_iterator.cmi : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi
-ocaml-parser/ast_mapper.cmi : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi
 ocaml-parser/asttypes.cmi : ocaml-parser/location.cmi
-ocaml-parser/attr_helper.cmi : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi ocaml-parser/asttypes.cmi
-ocaml-parser/builtin_attributes.cmi : ocaml-parser/parsetree.cmi \
-    ocaml-parser/location.cmi ocaml-parser/ast_iterator.cmi
-ocaml-parser/depend.cmi : ocaml-parser/parsetree.cmi \
-    ocaml-parser/longident.cmi
 ocaml-parser/docstrings.cmi : ocaml-parser/parsetree.cmi \
     ocaml-parser/location.cmi
 ocaml-parser/lexer.cmi : ocaml-parser/parser.cmi ocaml-parser/location.cmi
@@ -198,8 +117,6 @@ ocaml-parser/parser.cmi : ocaml-parser/parsetree.cmi \
     ocaml-parser/location.cmi ocaml-parser/docstrings.cmi
 ocaml-parser/parsetree.cmi : ocaml-parser/longident.cmi \
     ocaml-parser/location.cmi ocaml-parser/asttypes.cmi
-ocaml-parser/pprintast.cmi : ocaml-parser/parsetree.cmi
-ocaml-parser/printast.cmi : ocaml-parser/parsetree.cmi
 ocaml-parser/syntaxerr.cmi : ocaml-parser/location.cmi
 ocamllex-parser/lex_lexer.cmo : ocamllex-parser/lex_syntax.cmi \
     ocamllex-parser/lex_parser.cmi
