@@ -140,20 +140,26 @@ let option_iter f = function None -> () | Some x -> f x
 
 let ids_of_a_pattern p =
   let r = ref [] in
-  let add { txt = id; _ } = r := id :: !r in
+  let add etype { txt = id; _ } = r := (etype, id) :: !r in
   let rec pattern_d = function
     | Ppat_any -> ()
-    | Ppat_var id -> add id
-    | Ppat_alias (p,id) -> add id; pattern p
+    | Ppat_var id -> add Value id
+    | Ppat_alias (p,id) -> add Value id; pattern p
     | Ppat_constant _ -> ()
+    | Ppat_interval _ -> ()
     | Ppat_tuple pl -> List.iter pattern pl
     | Ppat_construct (_,po) -> option_iter pattern po
+    | Ppat_variant (_,po) -> option_iter pattern po
     | Ppat_record (l, _) -> iter_snd pattern l
     | Ppat_array pl -> List.iter pattern pl
     | Ppat_or (p1,p2) -> pattern p1; pattern p2
     | Ppat_constraint (p,_) -> pattern p
-    | Ppat_variant (_,po) -> option_iter pattern po
     | Ppat_type _ -> ()
+    | Ppat_lazy p -> pattern p
+    | Ppat_unpack id -> add Module id
+    | Ppat_exception p -> pattern p
+    | Ppat_extension ext -> ()
+    | Ppat_open (lid, p) -> pattern p
   and pattern p = 
     pattern_d p.ppat_desc
   in
@@ -162,7 +168,7 @@ let ids_of_a_pattern p =
 let pattern_for_def p =
   let loc = p.ppat_loc in
   let ids = ids_of_a_pattern p in
-  List.iter (add_def loc Value) ids
+  List.iter (fun (etype, id) -> add_def loc etype id) ids
 
 
 (*s The following function locally adds some given variables to the set of
@@ -171,7 +177,7 @@ let pattern_for_def p =
 
 let bind_variables ids f x =
   let save = !locals in
-  List.iter add_local ids;
+  List.iter (fun (_, id) -> add_local id) ids;
   f x;
   locals := save
 
@@ -209,7 +215,7 @@ and tr_core_type_desc loc = function
       List.iter tr_object_field_type l
   | Ptyp_class ({ txt = id; _ },l) ->
       add_uses_q loc Class id;
-      (*TODO:remove List.iter (add_def loc Label) ll;*)
+      (*i TODO:remove List.iter (add_def loc Label) ll;*)
       List.iter tr_core_type l
   | Ptyp_alias (ct,_) -> 
       tr_core_type ct
@@ -222,7 +228,7 @@ and tr_row_field = function
   | Rtag (_, _, _, ctl) -> List.iter tr_core_type ctl
   | Rinherit t -> tr_core_type t
 
-(* TODO:remove 
+(*i TODO:remove 
  * and tr_core_field_type ft =
   tr_core_field_desc ft.pfield_loc ft.pfield_desc*)
 
@@ -230,7 +236,7 @@ and tr_object_field_type (id, _, ct) =
   add_uses ct.ptyp_loc Method id;
   tr_core_type ct
 
-(* TODO:remove
+(*i TODO:remove
  * and tr_core_field_desc loc = function
   | Pfield (id,ct) ->
       add_uses loc Method id;
@@ -278,7 +284,7 @@ and tr_expression_desc loc = function
       option_iter tr_expression e
   | Pexp_function cs -> 
       List.iter tr_case cs
-(*TODO:remove  | Pexp_function (l,eo,pel) -> *)
+(*i TODO:remove  | Pexp_function (l,eo,pel) -> *)
   | Pexp_fun (l, eo, p, e) ->
       add_def loc Label (string_of_arg_label l);
       option_iter tr_expression eo;
@@ -316,10 +322,10 @@ and tr_expression_desc loc = function
       tr_expression e; 
       option_iter tr_core_type t1; 
       tr_core_type t2
-(*TODO:remove  | Pexp_when (e1,e2) ->
+(*i TODO:remove  | Pexp_when (e1,e2) ->
       tr_expression e1; tr_expression e2*)
   | Pexp_letmodule (x, m, e) ->
-      tr_module_expr m; bind_variables [x.txt] tr_expression e
+      tr_module_expr m; bind_variables [(Value, x.txt)] tr_expression e
   | Pexp_constant _ -> 
       ()
   | Pexp_send (e,id) ->
@@ -422,7 +428,7 @@ and tr_class_type_field { pctf_desc; pctf_loc; _ } =
   | Pctf_val (id, _, _, ct) ->
       add_def pctf_loc Value id;
       tr_core_type ct
-(*TODO:remove? | Pctf_virt (id,_,ct,loc) ->
+(*i TODO:remove? | Pctf_virt (id,_,ct,loc) ->
       add_def pctf_loc Method id;
       tr_core_type ct*)
   | Pctf_method (id, _, _, ct) ->
@@ -478,7 +484,7 @@ and tr_class_field { pcf_desc; pcf_loc; _ } =
   | Pcf_val (id, _, cfk) ->
       add_def pcf_loc Value id.txt;
       tr_class_field_kind cfk
-(*TODO:remove  | Pcf_virt(id,_,ct,loc) ->
+(*i TODO:remove  | Pcf_virt(id,_,ct,loc) ->
       add_def loc Method id;
       tr_core_type ct*)
   | Pcf_method (id, _, cfk) ->
@@ -487,7 +493,7 @@ and tr_class_field { pcf_desc; pcf_loc; _ } =
   | Pcf_constraint (ct1, ct2) ->
       tr_core_type ct1;
       tr_core_type ct2
-(*TODO:remove  | Pcf_let (recf,pel,_) -> 
+(*i TODO:remove  | Pcf_let (recf,pel,_) -> 
       let pl = List.map fst pel in
       if recf = Recursive then 
 	iter_snd (bind_patterns tr_expression pl) pel
@@ -514,7 +520,7 @@ and tr_module_type_desc loc = function
       tr_signature s
   | Pmty_functor (id, mt1, mt2) -> 
       option_iter tr_module_type mt1;
-      bind_variables [id.txt] tr_module_type mt2
+      bind_variables [(Value, id.txt)] tr_module_type mt2
   | Pmty_with (mt, cl) ->
       tr_module_type mt;
       List.iter (tr_with_constraint loc) cl
@@ -530,16 +536,16 @@ and tr_signature_item_desc loc = function
   | Psig_value vd ->
       tr_value_description vd
   | Psig_type (_, l) ->
-      (*TODO:remove iter_fst (add_def loc Type) l; *) 
+      (*i TODO:remove iter_fst (add_def loc Type) l; *) 
       List.iter tr_type_declaration l
   | Psig_exception ec (*id,ed*) ->
       tr_extension_constructor Exception ec
-     (*TODO:remove  add_def loc Exception id; tr_exception_declaration ed *)
+     (*i TODO:remove  add_def loc Exception id; tr_exception_declaration ed *)
   | Psig_module md ->
       tr_module_declaration md
   | Psig_recmodule mds ->
       List.iter tr_module_declaration mds 
-      (*TODO:remove (fun (id,mt) -> add_def loc Module id; tr_module_type mt) l*)
+      (*i TODO:remove (fun (id,mt) -> add_def loc Module id; tr_module_type mt) l*)
   | Psig_modtype mtd ->
       tr_modtype_declaration mtd
   | Psig_open q -> 
@@ -576,7 +582,7 @@ and tr_module_expr_desc loc = function
       tr_structure s
   | Pmod_functor (id,mt,me) ->
       option_iter tr_module_type mt;
-      bind_variables [id.txt] tr_module_expr me
+      bind_variables [(Value, id.txt)] tr_module_expr me
   | Pmod_apply (me1,me2) ->
       tr_module_expr me1;
       tr_module_expr me2
@@ -606,11 +612,11 @@ and tr_structure_item_desc loc = function
      tr_module_binding mb
   | Pstr_recmodule mbl ->
       List.iter tr_module_binding mbl
-(*TODO:remove	(fun (id,mt,me) -> 
+(*i TODO:remove	(fun (id,mt,me) -> 
 	   add_def loc Module id; tr_module_type mt; tr_module_expr me) l *)
   | Pstr_modtype mtd ->
       tr_modtype_declaration mtd
-(*TODO:remove add_def loc ModuleType id; tr_module_type mt *)
+(*i TODO:remove add_def loc ModuleType id; tr_module_type mt *)
   | Pstr_open { popen_lid; popen_loc; _ } -> 
       add_uses_q popen_loc Module popen_lid.txt
   | Pstr_class l -> 
