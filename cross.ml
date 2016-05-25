@@ -265,34 +265,8 @@ let rec tr_expression e =
 and tr_expression_desc loc = function
   | Pexp_ident q -> 
       add_uses_q loc Value q.txt
-  | Pexp_apply (e,lel) ->
-      tr_expression e; 
-      let tr_arg (l, e) = 
-        add_uses loc Label (string_of_arg_label l); 
-        tr_expression e in
-      List.iter tr_arg lel
-  | Pexp_ifthenelse (e1,e2,e3) -> 
-      tr_expression e1; tr_expression e2; option_iter tr_expression e3
-  | Pexp_sequence (e1,e2) ->
-      tr_expression e1; tr_expression e2
-  | Pexp_while (e1,e2) ->
-      tr_expression e1; tr_expression e2
-  | Pexp_tuple el ->
-      List.iter tr_expression el
-  | Pexp_construct (q,e) -> 
-      add_uses_q loc Constructor q.txt;
-      option_iter tr_expression e
-  | Pexp_function cs -> 
-      List.iter tr_case cs
-(*i TODO:remove  | Pexp_function (l,eo,pel) -> *)
-  | Pexp_fun (l, eo, p, e) ->
-      add_def loc Label (string_of_arg_label l);
-      option_iter tr_expression eo;
-      (bind_pattern tr_expression) (p, e)
-  | Pexp_match (e, cs) -> 
-      tr_expression e; List.iter tr_case cs
-  | Pexp_try (e, cs) -> 
-      tr_expression e; List.iter tr_case cs
+  | Pexp_constant _ -> 
+      ()
   | Pexp_let (recf, vbs, e) -> 
       let pl = List.map (fun { pvb_pat; _ } -> pvb_pat) vbs
       and iter_vb_expr f = List.iter (fun { pvb_expr; _ } -> f pvb_expr) in
@@ -301,6 +275,29 @@ and tr_expression_desc loc = function
       else
         iter_vb_expr tr_expression vbs; 
       bind_patterns tr_expression pl e
+  | Pexp_function cs -> 
+      List.iter tr_case cs
+  | Pexp_fun (l, eo, p, e) ->
+      add_def loc Label (string_of_arg_label l);
+      option_iter tr_expression eo;
+      (bind_pattern tr_expression) (p, e)
+  | Pexp_apply (e,lel) ->
+      tr_expression e; 
+      let tr_arg (l, e) = 
+        add_uses loc Label (string_of_arg_label l); 
+        tr_expression e in
+      List.iter tr_arg lel
+  | Pexp_match (e, cs) -> 
+      tr_expression e; List.iter tr_case cs
+  | Pexp_try (e, cs) -> 
+      tr_expression e; List.iter tr_case cs
+  | Pexp_tuple el ->
+      List.iter tr_expression el
+  | Pexp_construct (q,e) -> 
+      add_uses_q loc Constructor q.txt;
+      option_iter tr_expression e
+  | Pexp_variant (_,eo) ->
+      option_iter tr_expression eo
   | Pexp_record (l,e) ->
       iter_fst (fun { txt; _ } ->add_uses_q loc Field txt) l; 
       iter_snd tr_expression l; 
@@ -311,6 +308,12 @@ and tr_expression_desc loc = function
       tr_expression e1; add_uses_q loc Field q.txt; tr_expression e2
   | Pexp_array el ->
       List.iter tr_expression el
+  | Pexp_ifthenelse (e1,e2,e3) -> 
+      tr_expression e1; tr_expression e2; option_iter tr_expression e3
+  | Pexp_sequence (e1,e2) ->
+      tr_expression e1; tr_expression e2
+  | Pexp_while (e1,e2) ->
+      tr_expression e1; tr_expression e2
   | Pexp_for (p, e1, e2, _, e) ->
       tr_expression e1; 
       tr_expression e2; 
@@ -322,12 +325,6 @@ and tr_expression_desc loc = function
       tr_expression e; 
       option_iter tr_core_type t1; 
       tr_core_type t2
-(*i TODO:remove  | Pexp_when (e1,e2) ->
-      tr_expression e1; tr_expression e2*)
-  | Pexp_letmodule (x, m, e) ->
-      tr_module_expr m; bind_variables [(Value, x.txt)] tr_expression e
-  | Pexp_constant _ -> 
-      ()
   | Pexp_send (e,id) ->
       add_uses loc Method id; tr_expression e
   | Pexp_new id ->
@@ -337,8 +334,8 @@ and tr_expression_desc loc = function
   | Pexp_override l ->
       iter_fst (fun { txt; _ } -> add_uses loc Method txt) l; 
       iter_snd tr_expression l
-  | Pexp_variant (_,eo) ->
-      option_iter tr_expression eo
+  | Pexp_letmodule (x, m, e) ->
+      tr_module_expr m; bind_variables [(Value, x.txt)] tr_expression e
   | Pexp_assert e ->
       tr_expression e
 (*  | Pexp_assertfalse ->
