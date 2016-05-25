@@ -28,18 +28,22 @@ CAMLC    = @OCAMLC@
 CAMLCOPT = @OCAMLOPT@
 CAMLDEP  = @OCAMLDEP@
 
-ZLIBS    = -I ocaml-parser -I ocamllex-parser
+ZLIBS    = -I ocaml-parser -I ocaml-parser/utils -I ocamllex-parser
 DEBUG    =
 PROFILE  =
 BYTEFLAGS= $(ZLIBS) $(DEBUG)
-OPTFLAGS = $(ZLIBS) $(PROFILE)
+OPTFLAGS = $(ZLIBS) -g $(PROFILE)
 
-CAML_CMO = ocaml-parser/misc.cmo ocaml-parser/clflags.cmo	\
-	   ocaml-parser/terminfo.cmo ocaml-parser/warnings.cmo	\
-           ocaml-parser/linenum.cmo ocaml-parser/location.cmo	\
-	   ocaml-parser/longident.cmo \
+CAML_CMO = ocaml-parser/utils/misc.cmo ocaml-parser/utils/warnings.cmo \
+           ocaml-parser/utils/clflags.cmo \
+           ocaml-parser/utils/terminfo.cmo \
+           ocaml-parser/location.cmo \
+           ocaml-parser/docstrings.cmo ocaml-parser/ast_helper.cmo \
+           ocaml-parser/longident.cmo \
            ocaml-parser/syntaxerr.cmo ocaml-parser/parser.cmo	\
            ocaml-parser/lexer.cmo ocaml-parser/parse.cmo
+#           ocaml-parser/linenum.cmo 
+# ocaml-parser/utils/numbers.cmo \
 
 CAML_CMX = $(CAML_CMO:.cmo=.cmx)
 
@@ -149,10 +153,13 @@ FILES = *.ml* ocamlweb.sty bootstrap.tex				\
 	Makefile.in configure.in configure .depend \
 	README INSTALL COPYING LGPL CHANGES
 
-OCAMLFILES = misc.mli misc.ml clflags.ml	\
-        terminfo.mli terminfo.ml		\
-	warnings.mli warnings.ml		\
-	linenum.mli linenum.mll			\
+OCAMLFILES = utils/misc.mli     utils/misc.ml \
+	           utils/warnings.mli utils/warnings.ml		\
+             utils/numbers.mli  utils/numbers.ml	\
+             utils/clflags.mli  utils/clflags.ml	\
+             utils/terminfo.mli  utils/terminfo.ml	\
+             docstrings.mli docstrings.ml \
+             ast_helper.mli ast_helper.ml \
 	location.mli location.ml		\
 	longident.mli longident.ml		\
 	syntaxerr.mli syntaxerr.ml		\
@@ -161,6 +168,7 @@ OCAMLFILES = misc.mli misc.ml clflags.ml	\
 	lexer.mli lexer.mll			\
 	parse.mli parse.ml			\
 	README LICENSE
+#	linenum.mli linenum.mll			\
 
 OCAMLLEXFILES = lex_syntax.mli lex_parser.mly lex_lexer.mll
 
@@ -263,10 +271,11 @@ configure: configure.in
 
 GENERATED = doclexer.ml pretty.ml version.ml yacc_lexer.ml \
 	    yacc_parser.ml yacc_parser.mli yacc_parser.output \
-            ocaml-parser/lexer.ml ocaml-parser/linenum.ml \
+            ocaml-parser/lexer.ml \
 	    ocaml-parser/parser.mli ocaml-parser/parser.ml \
 	    ocamllex-parser/lex_lexer.ml ocamllex-parser/lex_parser.ml \
 	    ocamllex-parser/lex_parser.mli
+#ocaml-parser/linenum.ml \
 
 clean:
 	rm -f *~ *.cm[iox] *.o
@@ -284,7 +293,7 @@ dist-clean:: clean
 
 depend: $(GENERATED)
 	rm -f .depend
-	ocamldep $(ZLIBS) *.mli *.ml ocaml-parser/*.ml ocaml-parser/*.mli ocamllex-parser/*.ml ocamllex-parser/*.mli > .depend
+	ocamldep $(ZLIBS) *.mli *.ml ocaml-parser/*.ml ocaml-parser/utils/*.ml ocaml-parser/*.mli ocamllex-parser/*.ml ocamllex-parser/*.mli > .depend
 
 include .depend
 
